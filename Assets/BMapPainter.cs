@@ -27,6 +27,13 @@ namespace SCDisplay
             }
         }
 
+        public float lineWidth {
+            get { return map.lineWidth; }
+            set {
+                map.lineWidth = Mathf.Max(value, .01f);
+            }
+        }
+
         public BMapPainter(Texture2D tex, Box2 viewBox) {
             map = new SCBitmap(tex);
             this.viewBox = viewBox;
@@ -90,7 +97,7 @@ public class SCBitmap
     StripeFieldConfig stripeFieldConfig;
     MachineConfig machineConfig;
 
-    float lineWidth = 2f;
+    public float lineWidth = 2f;
 
     public SCBitmap(Texture2D tex) {
         this.tex = tex;

@@ -104,6 +104,25 @@ namespace SCParse
                 yield return new Edge2f(corner(i), corner((i + 1) % 4));
             }
         }
+
+        public Box2 scaled(float scale, bool fromMinCorner = false) {
+            if (fromMinCorner) {
+                return new Box2() { min = min, max = min + max * scale };
+            }
+            Vector2 sz = size * (scale - 1f);
+            return new Box2() { min = min - sz / 2f, max = max + sz / 2f };
+        }
+
+        public Box2 expandUniform(float expand, bool fromMinCorner = false) {
+            if(fromMinCorner) {
+                return new Box2() {
+                    min = min,
+                    max = new Vector2(max.x + expand, max.y + expand) };
+            }
+            return new Box2() {
+                min = new Vector2(min.x - expand / 2f, min.y - expand / 2f),
+                max = new Vector2(max.x + expand / 2f, max.y + expand / 2f) };
+        }
     }
 
     public class SVGViewBox : Box2

@@ -36,16 +36,13 @@
 !*TileScene.unity
 
 
-*.prefs
-*.db
-*.xml
-*.dll
+#*.prefs
+#*.db
+#*.xml
+#*.dll
 
 
-Library/
-Library/*
-ProjectSettings/
+#Library/
+#Library/*
+#ProjectSettings/
 .vs/
-
-Assets/YOURNAME/
-*.info

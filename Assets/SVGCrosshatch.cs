@@ -158,7 +158,12 @@ public class SVGCrosshatch : MonoBehaviour {
         StripedPathSet stripedPathSet = new StripedPathSet(plist, stripeFieldConfig, _svgFileData);
         SCCrosshatchGenerator generator = new SCCrosshatchGenerator(machineConfig, hatchConfig, _svgFileData, viewBox);
 
+        painter.lineWidth = 5f;
+        painter.color = new Color(0f, 1f, .9f);
         painter.DrawBox(machineConfig.paper);
+        painter.DrawBox(machineConfig.paper.expandUniform(-3f));
+        painter.lineWidth = 2f;
+        painter.color = Color.black;
         painter.applyTexture();
        
 

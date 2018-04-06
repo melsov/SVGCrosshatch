@@ -37,6 +37,9 @@ namespace SCGenerator
         [Header("Push down onto paper/material rate")]
         public float penetrationRateMMS = 100f;
 
+        [Header("How many decimal places in gcode coordinates")]
+        public int moveCoordFloatPrecision = 4;
+
         [TextArea]
         public string header = @"
 %
@@ -63,6 +66,9 @@ M2
                     _paper = new Box2() { min = Vector2.zero, max = new Vector2(8.5f * 25.4f, 11f * 25.4f) };
                 }
                 return _paper;
+            }
+            set {
+                _paper = value;
             }
         }
 
@@ -117,6 +123,8 @@ M2
         public bool isAtMaxPenetrationDepth(Vector3d v) {
             return MathUtil.EpsilonEqual(v.z, maxPenetrationDepthMM, locationEqualityEpsilonMM);
         }
+
+        
 
     }
 

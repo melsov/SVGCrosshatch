@@ -45,13 +45,10 @@ namespace UIController
             setInFileField();
         }
 
-        public void openSVG() {
-
-        }
 
         public void save() {
             if(svgCrosshatch.save()) {
-                savedToField.GetComponent<Image>().color = Color.green;
+                savedToField.GetComponent<Image>().color = new Color(.3f, 1f, .8f);
                 savedToField.text = svgCrosshatch.saveFullPath;
             } else {
                 savedToField.GetComponent<Image>().color = Color.red;
