@@ -13,11 +13,23 @@ namespace SCGenerator
         [Header("Soft limits from origin XYZ")]
         public Vector3 maxTravelMM = new Vector3(300f, 300f, 20f);
 
-        [Header("Max push-into-paper, cut into wood distance")]
-        public double maxPenetrationDepthMM = -1d;
+        [Header("Max push-into-paper, cut into material distance")]
+        double _maxPenetrationDepthMM = -1d;
+        public double maxPenetrationDepthMM {
+            get { return _maxPenetrationDepthMM; }
+            set {
+                _maxPenetrationDepthMM = MathUtil.Clamp(value, -3, 12);
+            }
+        }
 
         [Header("Travel height")]
-        public double travelHeightMM = 5d;
+        double _travelHeightMM = 5d;
+        public double travelHeightMM {
+            get { return _travelHeightMM; }
+            set {
+                _travelHeightMM = MathUtil.Clamp(value, -3, 24);
+            }
+        }
 
         [Header("Drill bit diameter or for a pen: line width at max 'penetration'")]
         public double toolDiameterMM = 2f;

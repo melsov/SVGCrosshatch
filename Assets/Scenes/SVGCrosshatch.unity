@@ -1680,6 +1680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d576af13739bbb5438fdfc4ca45c7b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  drawTravelMoves: 1
   pathOutlines: 0
   makeVariations: 0
   variationType: 1
@@ -2519,7 +2520,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 60, y: 20}
+  m_SizeDelta: {x: 60, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &815478173
 MonoBehaviour:
@@ -4048,7 +4049,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minTravelMM: {x: 0, y: 0, z: 0}
   maxTravelMM: {x: 300, y: 300, z: 20}
-  maxPenetrationDepthMM: -1
+  _maxPenetrationDepthMM: -1
   travelHeightMM: 5
   toolDiameterMM: 2
   homePositionOffsetMM: {x: 0, y: 0, z: 0}
@@ -5854,7 +5855,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 60, y: 20}
+  m_SizeDelta: {x: 60, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2101758565
 MonoBehaviour:
