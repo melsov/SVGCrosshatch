@@ -19,6 +19,9 @@ namespace SCGCode
         MachineConfig machineConfig;
         private string floatFormatter;
 
+        Vector2f cursor;
+        bool isCursorUp;
+
         void Start() {
             startFileLines = new List<string>();
             lines = new List<string>(1000);
@@ -33,18 +36,39 @@ namespace SCGCode
         }
 
         public void addMoves(PenUpdate pu) {
+            if(pu.from == null) {
+                lines.Add(penUpDown(true));
+                lines.Add(move(pu.to.destination, 1));
+                if(!pu.to.up)
+                    lines.Add(penUpDown(false));
+                return;
+            }
+
+            if(!machineConfig.isSameXY(cursor, pu.from.destination)) {
+                if(!isCursorUp)
+                    lines.Add(penUpDown(true));
+                lines.Add(move(pu.from.destination, 1));
+                
+            }
             int updown = 0;
-            if (pu.from == null || pu.to.up != pu.from.up ) {
-                updown = pu.to.up ? 1 : -1;
+            if (pu.from.up != isCursorUp ) {
+                updown = pu.from.up ? 1 : -1;
             }
+            
             if(updown != 0) {
-                lines.Add(penUpDown(updown < 0));
+                lines.Add(penUpDown(updown > 0));
             }
+
             lines.Add(move(pu.to.destination, updown));
+
+            if(pu.from.up != pu.to.up) {
+                lines.Add(penUpDown(pu.to.up));
+            }
         }
 
-        private string penUpDown(bool down) {
-            if(down) {
+        private string penUpDown(bool up) {
+            isCursorUp = up;
+            if(!up) {
                 return string.Format("G1 Z{0} F{1}", machineConfig.maxPenetrationDepthMM, machineConfig.penetrationRateMMS);
             } else {
                 return string.Format("G0 Z{0}", machineConfig.travelHeightMM);
@@ -53,6 +77,7 @@ namespace SCGCode
 
 
         private string move(Vector2f destination, int updown) {
+            cursor = destination;
             return string.Format("G{0} X{1} Y{2} {3}", 
                 updown == 1 ? "0" : "1", 
                 destination.x.ToString(floatFormatter), 
@@ -67,14 +92,14 @@ namespace SCGCode
                 default:
                     return "";
                 case -1:
-                    return string.Format("F{0}", machineConfig.penetrationRateMMS);
+                    return string.Format("F{0}", machineConfig.feedRateMMS);
             }
         }
 
         private IEnumerable<string> moveHome() {
-            yield return penUpDown(false);
-            yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
             yield return penUpDown(true);
+            yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
+            yield return penUpDown(false);
         }
 
         public bool saveLinesTo(string fullPath) {

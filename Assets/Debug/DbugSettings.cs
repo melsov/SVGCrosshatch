@@ -15,6 +15,7 @@ namespace SCGenerator
 
     public class DbugSettings : MonoBehaviour
     {
+        public bool drawTravelMoves;
         public bool pathOutlines;
         public bool makeVariations;
         public VariationType variationType;

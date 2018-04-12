@@ -50,6 +50,10 @@ namespace SCGenerator
         private void setPosition(PenMove next) {
 
             transform.position = machineConfig.getPosition(next);
+
+            // if current is null or (current is up and next is down)
+            //   send a pen update 
+
             PenUpdate update = new PenUpdate(current, next);
             foreach(var sub in subscribers) { sub(update); }
             current = next;

@@ -19,6 +19,7 @@ namespace SCDisplay
         float scaleToMap;
         bool flipX = true;
         bool flipY = false;
+        DbugSettings dbugSettings;
 
         public Color color {
             get { return map.color; }
@@ -38,6 +39,7 @@ namespace SCDisplay
             map = new SCBitmap(tex);
             this.viewBox = viewBox;
             scaleToMap = viewBox.getFitScale(map.size);
+            dbugSettings = UnityEngine.Object.FindObjectOfType<DbugSettings>();
         }
 
         public void DrawBox(Box2 box) {
@@ -55,7 +57,12 @@ namespace SCDisplay
 
         public void DrawPenMove(PenUpdate pu) {
             if(pu.from == null) { return; }
-            if(pu.from.up) { return; }// or draw moves in air 
+            if(dbugSettings.drawTravelMoves && pu.from.up) {
+                color = new Color(1f, .8f, .8f);
+                DrawLine(pu.from.destination, pu.to.destination);
+                color = Color.black;
+                return;
+            }// or draw moves in air 
 
             if(pu.from.hasColor) {
                 color = pu.from.color;

@@ -85,6 +85,15 @@ namespace SCGenerator
 
         public void Add(PenMove p) { moves.Add(p); }
 
+        public void addTravelMode(Vector2f to) {
+            Add(new PenMove() { destination = to, up = true });
+        }
+
+        public void addDrawMove(Vector2f start, Vector2f end, Color c) {
+            Add(new PenMove() { destination = start, up = false, color = c });
+            Add(new PenMove() { destination = end, up = true });
+        }
+
         public void Rotate(Matrix2f m) {
             for (int i = 0; i < moves.Count; ++i) {
                 moves[i].destination = m * moves[i].destination;
@@ -127,15 +136,15 @@ namespace SCGenerator
            
         }
 
-        //TODO: make this an IEnumerable<PP> instead
-        // to enable progress feedback. (but first make sure that this idea works...)
-
         public IEnumerable<PenPath> generate(StripedPathSet spSet) {
 
             foreach (var stripedPath in spSet.iter()) {
+
                 foreach(PenPath ppath in crosshatches(stripedPath)) {
                     yield return ppath;
                 }
+
+
                 if (dbugSettings.pathOutlines) {
                     foreach (PenPath ppath in outline(stripedPath)) {
                         yield return ppath;
@@ -151,7 +160,9 @@ namespace SCGenerator
             Matrix2f inverseRotation;
             PathData pdata;
 
+
             for(var stripeField = stripedPath.stripeField; stripeField != null; stripeField = stripeField.next) {
+
 
                 inverseRotation = stripeField.rotation.Inverse();
                 if(dbugSettings.dontRotateBackFinalPenPaths) {
@@ -178,6 +189,9 @@ namespace SCGenerator
                             //break; // want?
                         }
 
+
+                        
+
                         float closestXDelta = float.MaxValue;
 
                         for(int j = 0; j < pdata.exitFromLeftEdgeIndices.Count; ++j) {
@@ -194,11 +208,22 @@ namespace SCGenerator
                         }
 
                         if (closestXDelta < float.MaxValue) {
-                            yield return twoPointPenPath(
-                                leftIntersection,
-                                new Vector2f(leftIntersection.x + closestXDelta, y),
-                                inverseRotation,
-                                dbugSettings.dbugDrawing ? ColorUtil.roygbivMod(i) : Color.black);
+                            PenPath penPath = new PenPath();
+                            // travel move to leftIntersection
+                            //if (firstStripe) {
+                            //    firstStripe = false;
+                            //    penPath.addTravelMode((inverseRotation * leftIntersection) * viewBoxToPaperScale);
+                            //}
+                            penPath.addDrawMove(
+                                (inverseRotation * leftIntersection) * viewBoxToPaperScale,
+                                (inverseRotation * new Vector2f(leftIntersection.x + closestXDelta, y)) * viewBoxToPaperScale, 
+                                Color.black);
+                            yield return penPath;
+                            //yield return twoPointPenPath(
+                            //    leftIntersection,
+                            //    new Vector2f(leftIntersection.x + closestXDelta, y),
+                            //    inverseRotation,
+                            //    dbugSettings.dbugDrawing ? ColorUtil.roygbivMod(i) : Color.black);
                         }
                     }
 
@@ -256,10 +281,19 @@ namespace SCGenerator
         }
         private PenPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot, Color c) {
             PenPath pp = new PenPath();
-            pp.Add(new PenMove() { destination =(rot * start) * viewBoxToPaperScale, up = false, color = c });
-            pp.Add(new PenMove() { destination =(rot * end) * viewBoxToPaperScale, up = true });
+            pp.addDrawMove((rot * start) * viewBoxToPaperScale, (rot * end) * viewBoxToPaperScale, c);
+            //pp.Add(new PenMove() { destination = (rot * start) * viewBoxToPaperScale, up = false, color = c });
+            //pp.Add(new PenMove() { destination = (rot * end) * viewBoxToPaperScale, up = true });
             return pp;
         }
+        
+
+        //private PenPath travelMoveTo(Vector2f end, Matrix2f rot, Color c) {
+        //    PenPath pp = new PenPath();
+        //    pp.Add(new PenMove() { up = false, color = c });
+        //    pp.Add(new PenMove() { destination = (rot * end) * viewBoxToPaperScale, up = true });
+        //    return pp;
+        //}
 
         IEnumerable<PenPath> outline(StripedPath stripedPath) {
             Matrix2f inverseRotation;

@@ -145,8 +145,8 @@ namespace SCGenerator
 
         public int Count { get { return paths.Count; } }
 
-        public IEnumerable<StripedPath> iter() {
-            for(int i=0; i < Count; ++i) {
+        public IEnumerable<StripedPath> iter(int startIndex = 0) {
+            for(int i=startIndex; i < Count; ++i) {
                 yield return this[i];
             }
         }
