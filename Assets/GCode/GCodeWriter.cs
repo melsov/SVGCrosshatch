@@ -36,14 +36,6 @@ namespace SCGCode
         }
 
         public void addMoves(PenUpdate pu) {
-            //if(pu.from == null) {
-            //    lines.Add("(pu from was null)");
-            //    lines.Add(penUpDown(true));
-            //    lines.Add(move(pu.to.destination, 1));
-            //    if(!pu.to.up)
-            //        lines.Add(penUpDown(false));
-            //    return;
-            //}
 
             List<PenMove> moves = pu.drawPath.GetMoves().ToList();
             if(moves.Count == 0) { return; }
@@ -51,11 +43,9 @@ namespace SCGCode
             PenMove first = moves[0];
 
             if(!machineConfig.isSameXY(cursor, first.destination)) {
-                lines.Add( string.Format("(cursor {0} not at from {1})", cursor.ToString(), first.destination.ToString()));
                 if (!isCursorUp)
                     lines.Add(penUp());
                 lines.Add(move(first.destination, 1));
-                lines.Add("(end cursor not at from)");
             }
 
             if(isCursorUp) {
@@ -70,20 +60,7 @@ namespace SCGCode
                 lines.Add(move(next.destination, 0));
             }
 
-            //int updown = 0;
-            //if (pu.from.up != isCursorUp ) {
-            //    updown = pu.from.up ? 1 : -1;
-            //}
-            
-            //if(updown != 0) {
-            //    lines.Add(penUpDown(updown > 0));
-            //}
 
-            //lines.Add(move(pu.to.destination, updown));
-
-            //if(pu.from.up != pu.to.up) {
-            //    lines.Add(penUpDown(pu.to.up));
-            //}
         }
 
 
