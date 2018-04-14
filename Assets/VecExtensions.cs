@@ -37,6 +37,9 @@ namespace VctorExtensions
             return b.min.xy().lessThan(v) && b.max.xy().grThan(v);
         }
 
+        //Vector3f 
+        public static Vector2f toVector2f(this Vector3f v) { return new Vector2f(v.x, v.y); }
+
         //Vec2f extensions
 
         public static Vector2f min(this Vector2f v, Vector2f other) {

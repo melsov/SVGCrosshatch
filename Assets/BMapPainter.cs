@@ -20,6 +20,7 @@ namespace SCDisplay
         bool flipX = true;
         bool flipY = false;
         DbugSettings dbugSettings;
+        MachineConfig machineConfig;
 
         public Color color {
             get { return map.color; }
@@ -40,6 +41,7 @@ namespace SCDisplay
             this.viewBox = viewBox;
             scaleToMap = viewBox.getFitScale(map.size);
             dbugSettings = UnityEngine.Object.FindObjectOfType<DbugSettings>();
+            machineConfig = UnityEngine.Object.FindObjectOfType<MachineConfig>();
         }
 
         public void DrawBox(Box2 box) {
@@ -55,19 +57,47 @@ namespace SCDisplay
             //map.DrawLine(flip(from * scaleToMap + dif), flip(to * scaleToMap + dif));
         }
 
-        public void DrawPenMove(PenUpdate pu) {
-            if(pu.from == null) { return; }
-            if(dbugSettings.drawTravelMoves && pu.from.up) {
-                color = new Color(1f, .8f, .8f);
-                DrawLine(pu.from.destination, pu.to.destination);
-                color = Color.black;
+        public void DrawCursorUpdate(CursorUpdate cu) {
+            if(dbugSettings.drawTravelMoves && machineConfig.isAtTravelHeight(cu.to)) {
+                DrawTravelMove(cu.from.xy, cu.to.xy);
                 return;
-            }// or draw moves in air 
-
-            if(pu.from.hasColor) {
-                color = pu.from.color;
             }
-            DrawLine(pu.from.destination, pu.to.destination);
+            DrawLine(cu.from.xy, cu.to.xy);
+        }
+
+        private void DrawPath(PenDrawingPath path) {
+            List<PenMove> moves = path.GetMoves().ToList();
+            if(moves.Count == 0) { return; }
+            PenMove last = moves[0];
+            PenMove next;
+            for(int i = 1; i < moves.Count; ++i) {
+                next = moves[i];
+                DrawLine(last.destination, next.destination);
+                last = next;
+            }
+        }
+
+        public void DrawPenUpdate(PenUpdate pu) {
+            DrawPath(pu.drawPath);
+
+            //if(pu.from == null) { return; }
+            //if(dbugSettings.drawTravelMoves && pu.from.up) {
+            //    DrawTravelMove(pu.from.destination, pu.to.destination);
+            //    return;
+            //}// or draw moves in air 
+
+            //if(pu.from.hasColor) {
+            //    color = pu.from.color;
+            //}
+            //DrawLine(pu.from.destination, pu.to.destination);
+        }
+
+        private void DrawTravelMove(Vector2f from, Vector2f to) {
+            lineWidth = .9f;
+            color = new Color(.6f, .1f, .1f);
+            DrawLine(from, to);
+            color = Color.black;
+            lineWidth = 2f;
         }
 
         public Texture2D texture {

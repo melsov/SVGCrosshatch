@@ -15,6 +15,8 @@ namespace SCGenerator
 
     public class DbugSettings : MonoBehaviour
     {
+        public bool paintFromGCode;
+        public bool paintFromPenMoves;
         public bool drawTravelMoves;
         public bool pathOutlines;
         public bool makeVariations;
@@ -34,5 +36,7 @@ namespace SCGenerator
         public bool deriveLineWidthFromPenWidth = false;
         [SerializeField, Range(1f, 20f), Header("not used if deriving from pen width")]
         public float displayLineWidth = 3f;
+        [SerializeField]
+        public int hatchCount = 2;
     }
 }

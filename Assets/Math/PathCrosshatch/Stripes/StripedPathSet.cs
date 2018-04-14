@@ -90,9 +90,6 @@ namespace SCGenerator
         private StripeField debugStripeField(int i) {
             return new StripeField()
             {
-                //direction = dbugSettings.variationType == VariationType.RotateStripeDirection ?
-                //new Matrix2f((dbugSettings.reverseClockwiseOrderCopies ? (i * 2) % paths.Count : i) / (float)paths.Count * Mathf.PI) * dbugSettings.baseStripeDirection :
-                //dbugSettings.baseStripeDirection,
                 angleRadians = dbugSettings.variationType == VariationType.RotateStripeDirection ?
                     (dbugSettings.reverseClockwiseOrderCopies ? (i * 2) % paths.Count : i) / (float)paths.Count * Mathf.PI 
                     + dbugSettings.baseStripeAngleRadians :
@@ -103,24 +100,6 @@ namespace SCGenerator
 
 #endregion
 
-        //private void setupFields(SvgParser.SvgPath path) {
-
-        //    //List<StripeField> sfs = new Something??? List<StripeField>();
-        //    int count = 0;
-        //    for (var it = path; it != null; it = it.next) {
-        //        // TODO: design a thing that can tell us what interval , direction to assign to each sfield
-        //        count++;
-        //    }
-
-        //    sfields = new StripeField[count];
-
-        //    //TODO: something more interesting
-        //    for (int i = 0; i < sfields.Length; ++i) {
-        //        sfields[i] = new StripeField();
-        //        sfields[i].direction = new Vector2f(1f, 0f);
-        //        sfields[i].interval = 8f;
-        //    }
-        //}
 
         public StripedPath this[int i] {
             get {

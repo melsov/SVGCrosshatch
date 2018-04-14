@@ -1489,7 +1489,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  _lineWidth: 2
+  _lineWidth: 8
   _twoLinePatternCuttoff: 0.6
   _whiteValueCuttoff: 0.909
   referenceAreaGain: 0.09
@@ -1680,8 +1680,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d576af13739bbb5438fdfc4ca45c7b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  paintFromGCode: 1
+  paintFromPenMoves: 0
   drawTravelMoves: 1
-  pathOutlines: 0
+  pathOutlines: 1
   makeVariations: 0
   variationType: 1
   numVariations: 3
@@ -1694,6 +1696,7 @@ MonoBehaviour:
   baseStripeAngleRadians: 0
   deriveLineWidthFromPenWidth: 0
   displayLineWidth: 1.78
+  hatchCount: 2
 --- !u!4 &527546787
 Transform:
   m_ObjectHideFlags: 0
@@ -3929,14 +3932,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4769477fc6a55994b8a78c144c8263fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  svgFile: grays
+  svgFile: gray
   yAxisInverted: 1
   canvas: {fileID: 2800000, guid: 409af4754c2580e45a545025bb2fbf1d, type: 3}
   mat: {fileID: 2100000, guid: 99fcef1456d7d024a9c8fbbb15169f00, type: 2}
-  showWithLineRenderers: 0
+  showWithLineRenderers: 1
   pathDisplayPrefab: {fileID: 114382524412442938, guid: acc0075ea2f34d04b9b154bb63a98612,
     type: 2}
-  drawPathsOnTexture: 1
   progressText: {fileID: 1052580256}
   progressUpdates: 1
 --- !u!4 &1181864920
@@ -4049,8 +4051,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minTravelMM: {x: 0, y: 0, z: 0}
   maxTravelMM: {x: 300, y: 300, z: 20}
-  _maxPenetrationDepthMM: -1
-  travelHeightMM: 5
   toolDiameterMM: 2
   homePositionOffsetMM: {x: 0, y: 0, z: 0}
   feedRateMMS: 400

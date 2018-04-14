@@ -37,11 +37,12 @@ namespace SCGenerator
 
         public float targetWidthForValue(float val) {
             /*
-             * For 90 degree crosshatches. See crosshatches as a grid of 'L' shapes
+             * See crosshatches as a grid of 'L' shapes (assume orthagonal, 90 degree crosshatches)
              * Each 'L' is two sides of a square with dimensions = w^2
              * lineWidth = s, dark area = 2ws - ss
-             * value = dark area/ww = (2ws - ss) / ww
+             * value (h) = dark area/ww = (2ws - ss) / ww
              * solve for w: -h w^2 + 2s w + -s^2 = 0
+             * (relative angle doesn't matter since the resulting parallelogram will have the same area) 
              */
 
             float a = -val;

@@ -59,7 +59,7 @@ namespace SCGenerator
         public static implicit operator NullableColor(Color c) { return new NullableColor(c); }
     }
 
-    public class PenPath  {
+    public class PenDrawingPath  {
 
         private List<PenMove> moves = new List<PenMove>();
 
@@ -136,17 +136,17 @@ namespace SCGenerator
            
         }
 
-        public IEnumerable<PenPath> generate(StripedPathSet spSet) {
+        public IEnumerable<PenDrawingPath> generate(StripedPathSet spSet) {
 
             foreach (var stripedPath in spSet.iter()) {
 
-                foreach(PenPath ppath in crosshatches(stripedPath)) {
+                foreach(PenDrawingPath ppath in crosshatches(stripedPath)) {
                     yield return ppath;
                 }
 
 
                 if (dbugSettings.pathOutlines) {
-                    foreach (PenPath ppath in outline(stripedPath)) {
+                    foreach (PenDrawingPath ppath in outline(stripedPath)) {
                         yield return ppath;
                     }
                 }
@@ -155,7 +155,7 @@ namespace SCGenerator
 
         }
 
-        IEnumerable<PenPath> crosshatches(StripedPath stripedPath) {
+        IEnumerable<PenDrawingPath> crosshatches(StripedPath stripedPath) {
 
             Matrix2f inverseRotation;
             PathData pdata;
@@ -208,7 +208,7 @@ namespace SCGenerator
                         }
 
                         if (closestXDelta < float.MaxValue) {
-                            PenPath penPath = new PenPath();
+                            PenDrawingPath penPath = new PenDrawingPath();
                             // travel move to leftIntersection
                             //if (firstStripe) {
                             //    firstStripe = false;
@@ -235,8 +235,8 @@ namespace SCGenerator
         }
 
 #region debug-shapes
-        private PenPath arrowToNextDBUG(int i, PathData pdata, Matrix2f rot) {
-            var pp = new PenPath();
+        private PenDrawingPath arrowToNextDBUG(int i, PathData pdata, Matrix2f rot) {
+            var pp = new PenDrawingPath();
             Vector2f last = Vector2f.Zero;
             foreach(var v in pdata.arrowFromThisToNext(i)) {
                 last = (rot * v) * viewBoxToPaperScale;
@@ -246,8 +246,8 @@ namespace SCGenerator
             return pp;
         }
 
-        private PenPath dotAtDBUG(Vector2f v, Matrix2f rot, Color c, float size = 5f) {
-            var pp = new PenPath();
+        private PenDrawingPath dotAtDBUG(Vector2f v, Matrix2f rot, Color c, float size = 5f) {
+            var pp = new PenDrawingPath();
             v = rot * v;
             Box2f box = new Box2f() { min = v, max = v + Vector2f.One * size };
             foreach(Vector2f l in box.getHorizontalLines()) {
@@ -257,8 +257,8 @@ namespace SCGenerator
             return pp;
         }
 
-        private PenPath pathForBoxDBUG(Box2f box) {
-            PenPath pp = new PenPath();
+        private PenDrawingPath pathForBoxDBUG(Box2f box) {
+            PenDrawingPath pp = new PenDrawingPath();
             pp.Add(new PenMove() { destination = box.min * viewBoxToPaperScale, color = Color.red });
             pp.Add(new PenMove() { destination = box.lowerRight * viewBoxToPaperScale });
             pp.Add(new PenMove() { destination = box.max * viewBoxToPaperScale });
@@ -267,20 +267,20 @@ namespace SCGenerator
             return pp;
         }
 
-        private PenPath shortLineDBUG(Vector2f v, Matrix2f rot, Color c, float length = 8f) {
+        private PenDrawingPath shortLineDBUG(Vector2f v, Matrix2f rot, Color c, float length = 8f) {
             return twoPointPenPath(v, v + Vector2f.One * length, rot, c);
         }
 
-        private PenPath drawEdge(Edge2f e, Matrix2f rot, Color c) {
+        private PenDrawingPath drawEdge(Edge2f e, Matrix2f rot, Color c) {
             return twoPointPenPath(e.a, e.b, rot, c);
         }
 
 #endregion
-        private PenPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot) {
+        private PenDrawingPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot) {
             return twoPointPenPath(start, end, rot, Color.black);
         }
-        private PenPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot, Color c) {
-            PenPath pp = new PenPath();
+        private PenDrawingPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot, Color c) {
+            PenDrawingPath pp = new PenDrawingPath();
             pp.addDrawMove((rot * start) * viewBoxToPaperScale, (rot * end) * viewBoxToPaperScale, c);
             //pp.Add(new PenMove() { destination = (rot * start) * viewBoxToPaperScale, up = false, color = c });
             //pp.Add(new PenMove() { destination = (rot * end) * viewBoxToPaperScale, up = true });
@@ -295,7 +295,7 @@ namespace SCGenerator
         //    return pp;
         //}
 
-        IEnumerable<PenPath> outline(StripedPath stripedPath) {
+        IEnumerable<PenDrawingPath> outline(StripedPath stripedPath) {
             Matrix2f inverseRotation;
             PathData pdata;
             for (var stripeField = stripedPath.stripeField; stripeField != null; stripeField = stripeField.next) {

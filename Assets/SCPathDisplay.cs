@@ -43,7 +43,7 @@ namespace SCDisplay
             displayPoints(PathToVector.GetPointList(path));
         }
 
-        public void display(PenPath penPath) {
+        public void display(PenDrawingPath penPath) {
             lr.positionCount = penPath.Count;
             //lr.widthMultiplier = widthMult;
             //lr.widthCurve = widthCurve;

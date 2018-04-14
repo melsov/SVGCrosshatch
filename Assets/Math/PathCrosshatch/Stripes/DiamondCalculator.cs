@@ -72,6 +72,11 @@ namespace SCGenerator
                 interval = interval
             };
 
+            if(dbugSettings.hatchCount == 1) {
+                sfield = _next;
+                return true;
+            }
+
             sfield = new StripeField()
             {
                 angleRadians = priAngle,

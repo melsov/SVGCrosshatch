@@ -11,17 +11,19 @@ using System.Linq;
 using g3;
 using UnityEngine.UI;
 using SCGCode;
+using System.Text.RegularExpressions;
 
 public class SVGCrosshatch : MonoBehaviour {
 
     [SerializeField]
-    string svgFile = @"Data/star.svg";
+    string svgFile = @"star.svg";
 
     [SerializeField]
     bool yAxisInverted = true;
 
     [SerializeField]
     Texture2D canvas;
+    Texture2D canvasClone;
 
     [SerializeField]
     Material mat;
@@ -38,9 +40,6 @@ public class SVGCrosshatch : MonoBehaviour {
     Color testColor = Color.cyan;
 
     [SerializeField]
-    private bool drawPathsOnTexture;
-
-    [SerializeField]
     Text progressText;
 
     [SerializeField]
@@ -49,6 +48,8 @@ public class SVGCrosshatch : MonoBehaviour {
     private string DataFolder { get { return string.Format("{0}/Data/", Application.dataPath); } }
 
     bool finished;
+
+    DbugSettings dbugSettings;
 
     public string svgFullPath {
         get {
@@ -80,6 +81,8 @@ public class SVGCrosshatch : MonoBehaviour {
         }
     }
 
+
+
     public string svgFileNameNoExtension {
         get {
             return Path.GetFileNameWithoutExtension(svgFullPath);
@@ -90,12 +93,6 @@ public class SVGCrosshatch : MonoBehaviour {
         StartCoroutine(lateStart());
 	}
 
-    void testFMs() {
-        float interval = 1f;
-        for(float f = -3f; f < 3f; f += .2f) {
-            Debug.Log(string.Format("next above: {0} is {1}", f, testFMods(f, interval)));
-        }
-    }
 
     float testFMods(float minY, float interval) {
         if (minY < 0f) {
@@ -127,13 +124,24 @@ public class SVGCrosshatch : MonoBehaviour {
 
     void Setup() {
         finished = false;
-        Texture2D clone = Instantiate(canvas);
-        mat.mainTexture = clone;
+        canvasClone = Instantiate(canvas);
+        mat.mainTexture = canvasClone;
         machineConfig = FindObjectOfType<MachineConfig>();
         gCodeWriter = FindObjectOfType<GCodeWriter>();
-        painter = new BMapPainter(clone, machineConfig.paper);
+        dbugSettings = FindObjectOfType<DbugSettings>();
+        painter = new BMapPainter(canvasClone, machineConfig.paper);
       
     }
+
+    private void clear() {
+        Destroy(canvasClone);
+        if (gCodeWriter != null)
+            gCodeWriter.Reset();
+        foreach (var pd in GetComponentsInChildren<SCPathDisplay>()) {
+            Destroy(pd.gameObject);
+        }
+    }
+
 
     public void Redraw() {
         clear();
@@ -175,16 +183,34 @@ public class SVGCrosshatch : MonoBehaviour {
     }
 
     void addPenSubscribers(SCPen pen) {
-        if (drawPathsOnTexture) {
+        if (dbugSettings.paintFromPenMoves) {
             pen.subscribe((PenUpdate pu) =>
             {
-                painter.DrawPenMove(pu);
+                painter.DrawPenUpdate(pu);
             });
         }
         pen.subscribe((PenUpdate pu) =>
         {
             gCodeWriter.addMoves(pu);
         });
+    }
+
+    void paintFromGCode() {
+        if (!dbugSettings.paintFromGCode) { return; }
+        if(dbugSettings.paintFromGCode && dbugSettings.paintFromPenMoves) {
+            Debug.Log("Warning: drawing crosshatches twice ");
+        }
+        GCodeCursor gCodeCursor = new GCodeCursor();
+        gCodeCursor.subscribe((CursorUpdate cu) =>
+        {
+            painter.DrawCursorUpdate(cu);
+        });
+
+        foreach(string line in gCodeWriter.getLines()) {
+            gCodeCursor.moveTo(line);
+        }
+
+        painter.applyTexture();
     }
 
     void beFinished() {
@@ -197,7 +223,7 @@ public class SVGCrosshatch : MonoBehaviour {
         addPenSubscribers(pen);
 
         int count = 0;
-        foreach (PenPath penPath in generator.generate(stripedPathSet)) {
+        foreach (PenDrawingPath penPath in generator.generate(stripedPathSet)) {
             pen.makeMoves(penPath);
             if(showWithLineRenderers) { lineRenderPenPath(penPath); }
 
@@ -208,6 +234,7 @@ public class SVGCrosshatch : MonoBehaviour {
 
         }
         progressText.text = string.Format("{0}", count);
+        paintFromGCode();
         beFinished();
         painter.applyTexture();
     }
@@ -218,27 +245,27 @@ public class SVGCrosshatch : MonoBehaviour {
         SCPen pen = FindObjectOfType<SCPen>();
         addPenSubscribers(pen);
 
-        foreach (PenPath penPath in penIterator) {
+        foreach (PenDrawingPath penPath in penIterator) {
             pen.makeMoves(penPath);
         }
 
         if (showWithLineRenderers) {
-            foreach (PenPath penPath in penIterator) {
+            foreach (PenDrawingPath penPath in penIterator) {
                 lineRenderPenPath(penPath);
             }
         }
 
-
+        paintFromGCode();
         beFinished();
         painter.applyTexture();
     }
 
 
-    private void testRotationsWith(List<PenPath> penIterator, SCPen pen, Matrix2f m) {
-        foreach (PenPath penPath in penIterator) {
+    private void testRotationsWith(List<PenDrawingPath> penIterator, SCPen pen, Matrix2f m) {
+        foreach (PenDrawingPath penPath in penIterator) {
             penPath.Rotate(m);
         }
-        foreach (PenPath penPath in penIterator) {
+        foreach (PenDrawingPath penPath in penIterator) {
             if (showWithLineRenderers) {
                 lineRenderPenPath(penPath);
             }
@@ -250,14 +277,6 @@ public class SVGCrosshatch : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    private void clear() {
-        if(gCodeWriter != null)
-            gCodeWriter.Reset();
-        foreach(var pd in GetComponentsInChildren<SCPathDisplay>()) {
-            Destroy(pd.gameObject);
-        }
-    }
-
     private void lineRenderPath(SvgParser.SvgPath path) {
         SCPathDisplay display = Instantiate(pathDisplayPrefab); // go.AddComponent<SCPathDisplay>();
         display.color = testColor;
@@ -265,7 +284,7 @@ public class SVGCrosshatch : MonoBehaviour {
         display.display(path);
     }
 
-    private void lineRenderPenPath(PenPath path, GameObject go = null) {
+    private void lineRenderPenPath(PenDrawingPath path, GameObject go = null) {
         SCPathDisplay display = Instantiate(pathDisplayPrefab); // go.AddComponent<SCPathDisplay>();
         display.color = testColor;
         display.transform.parent = go? go.transform : transform;
