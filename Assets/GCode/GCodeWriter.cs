@@ -99,8 +99,16 @@ namespace SCGCode
 
         private IEnumerable<string> moveHome() {
             yield return penUpDown(true);
-            //yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
+            yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
             //yield return penUpDown(false);
+        }
+
+        private IEnumerable<string> returnHome() {
+            yield return "(return home)";
+            yield return penUpDown(true);
+            yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
+            yield return penUpDown(false);
+            yield return "(end return home)";
         }
 
         public IEnumerable<string> getLines() {
@@ -123,6 +131,11 @@ namespace SCGCode
                     foreach (string line in lines) {
                         outputFile.WriteLine(line);
                     }
+
+                    foreach(string line in returnHome()) {
+                        outputFile.WriteLine(line);
+                    }
+
                     outputFile.WriteLine();
                     outputFile.Write(machineConfig.footer.ToCharArray());
                 }

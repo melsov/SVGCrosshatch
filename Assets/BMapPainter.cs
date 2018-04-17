@@ -51,18 +51,18 @@ namespace SCDisplay
         }
 
         public void DrawLine(Vector2 from, Vector2 to) {
-            map.DrawLine(flip(from * scaleToMap), flip(to * scaleToMap));
-            ////make lines more visible
-            //Vector2 dif = (to - from).normalized * 1.2f;
-            //map.DrawLine(flip(from * scaleToMap + dif), flip(to * scaleToMap + dif));
+            map.DrawLine(flip(from * scaleToMap), flip(to * scaleToMap), dbugSettings.pathDirIndicators);
         }
 
         public void DrawCursorUpdate(CursorUpdate cu) {
-            if(dbugSettings.drawTravelMoves && machineConfig.isAtTravelHeight(cu.to)) {
-                DrawTravelMove(cu.from.xy, cu.to.xy);
-                return;
+            if (machineConfig.isAtTravelHeight(cu.to)) {
+                if (dbugSettings.drawTravelMoves) {
+                    DrawTravelMove(cu.from.xy, cu.to.xy);
+                    return;
+                }
+            } else {
+                DrawLine(cu.from.xy, cu.to.xy);
             }
-            DrawLine(cu.from.xy, cu.to.xy);
         }
 
         private void DrawPath(PenDrawingPath path) {
@@ -80,16 +80,6 @@ namespace SCDisplay
         public void DrawPenUpdate(PenUpdate pu) {
             DrawPath(pu.drawPath);
 
-            //if(pu.from == null) { return; }
-            //if(dbugSettings.drawTravelMoves && pu.from.up) {
-            //    DrawTravelMove(pu.from.destination, pu.to.destination);
-            //    return;
-            //}// or draw moves in air 
-
-            //if(pu.from.hasColor) {
-            //    color = pu.from.color;
-            //}
-            //DrawLine(pu.from.destination, pu.to.destination);
         }
 
         private void DrawTravelMove(Vector2f from, Vector2f to) {
@@ -145,16 +135,16 @@ public class SCBitmap
         size = new Vector2(tex.width, tex.height);
     }
 
-    public void DrawLine(Vector2 from, Vector2 to) {
+    public void DrawLine(Vector2 from, Vector2 to, bool shouldUseDirIndicator = false) {
         Vector2 dir = to - from;
         float mag = dir.magnitude;
         if(mag < Mathf.Epsilon) { return; }
         dir /= mag;
         //LineOne(from, dir, mag);
-        LineBox(from, to, lineWidth);
+        LineBox(from, to, lineWidth, shouldUseDirIndicator);
     }
 
-    private void LineBox(Vector2 from, Vector2 to, float width = 2f) {
+    private void LineBox(Vector2 from, Vector2 to, float width = 2f, bool shoudlUseDirIndicator = false) {
         Vector2 dir = to - from;
         float mag = dir.magnitude;
         if(mag < Mathf.Epsilon) { return; }
@@ -169,15 +159,15 @@ public class SCBitmap
             SetPixel(start + mat * vi);
         }
         //TODO: optimize this 
+        if (shoudlUseDirIndicator) {
+            Vector2 arrow = to;
+            foreach(int i in Enumerable.Range(0, 16)) {
+                SetPixel(arrow, Color.red);
+                arrow -= dir;
+            }
+        }
     }
 
-    private struct Pix2i
-    {
-        Vector2i v;
-        Color c;
-    }
-
-        
 
     private void LineOne(Vector2 from, Vector2 dir, float mag) {
         count = 0f;
@@ -193,6 +183,10 @@ public class SCBitmap
         SetPixel((int)v.x, (int)v.y);
     }
 
+    public void SetPixel(Vector2 v, Color c) {
+        SetPixel((int)v.x, (int)v.y, c);
+    }
+
     public void SetPixel(Vector2Int v) {
         SetPixel(v.x, v.y);
     }
@@ -202,9 +196,13 @@ public class SCBitmap
     }
 
     public void SetPixel(int x, int y) {
+        SetPixel(x, y, color);
+    }
+
+    public void SetPixel(int x, int y, Color c) {
         x = Mathf.Clamp(x, 0, (int)size.x - 1);
         y = Mathf.Clamp(y, 0, (int)size.y - 1);
-        tex.SetPixel(x, y, color);
+        tex.SetPixel(x, y, c);
     }
 
 }

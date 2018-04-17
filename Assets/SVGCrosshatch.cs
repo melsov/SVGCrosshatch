@@ -28,8 +28,11 @@ public class SVGCrosshatch : MonoBehaviour {
     [SerializeField]
     Material mat;
 
-    [SerializeField]
-    bool showWithLineRenderers;
+
+    bool showWithLineRenderers {
+        get { return dbugSettings.showWithLineRenderers;  }
+    }
+    int lineRendererLimit = 600;
     [SerializeField]
     SCPathDisplay pathDisplayPrefab;
 
@@ -285,6 +288,7 @@ public class SVGCrosshatch : MonoBehaviour {
     }
 
     private void lineRenderPenPath(PenDrawingPath path, GameObject go = null) {
+        if(lineRendererLimit-- <= 0) { return; }
         SCPathDisplay display = Instantiate(pathDisplayPrefab); // go.AddComponent<SCPathDisplay>();
         display.color = testColor;
         display.transform.parent = go? go.transform : transform;

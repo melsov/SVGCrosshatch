@@ -22,7 +22,7 @@ namespace SCGenerator
             }
         }
 
-        [Header("Travel height")]
+        [SerializeField, Header("Travel height")]
         double _travelHeightMM = 5d;
         public double travelHeightMM {
             get { return _travelHeightMM; }
@@ -64,8 +64,8 @@ G21 (All units in mm) ";
         [TextArea]
         public string footer = @"
 (Footer)
-M5
-G00 X0.0000 Y0.0000
+( dont need stop spindle from turning M5)
+( dont need. added return home in gcode writer G00 X0.0000 Y0.0000)
 M2
 (Footer end)
 % ";

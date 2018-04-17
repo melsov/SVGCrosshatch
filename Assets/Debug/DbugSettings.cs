@@ -15,19 +15,24 @@ namespace SCGenerator
 
     public class DbugSettings : MonoBehaviour
     {
+        [Header("--Display settings--")]
         public bool paintFromGCode;
         public bool paintFromPenMoves;
         public bool drawTravelMoves;
         public bool pathOutlines;
+        public bool pathDirIndicators;
+        [Header("Limited to a small-ish number of lines")]
+        public bool showWithLineRenderers;
+        [Header("--Variations/Test settings--")]
         public bool makeVariations;
         public VariationType variationType;
         public int numVariations = 12;
+        public bool reverseClockwiseOrderCopies;
+        public bool dontRotateBackFinalPenPaths;
         [Range(1, 24)]
         public int variationColumns = 4;
         public bool dbugDrawing;
         public float dbugStripeInterval = 22f;
-        public bool reverseClockwiseOrderCopies;
-        public bool dontRotateBackFinalPenPaths;
         [SerializeField]
         private Vector2 _baseStripeDirection = Vector2.right;
         public Vector2f baseStripeDirection { get { return _baseStripeDirection.normalized; } }

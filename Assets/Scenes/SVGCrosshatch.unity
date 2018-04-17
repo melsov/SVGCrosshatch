@@ -1489,7 +1489,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  _lineWidth: 8
+  _lineWidth: 2.5
   _twoLinePatternCuttoff: 0.6
   _whiteValueCuttoff: 0.909
   referenceAreaGain: 0.09
@@ -1682,16 +1682,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   paintFromGCode: 1
   paintFromPenMoves: 0
-  drawTravelMoves: 1
-  pathOutlines: 1
+  drawTravelMoves: 0
+  pathOutlines: 0
+  pathDirIndicators: 1
+  showWithLineRenderers: 0
   makeVariations: 0
   variationType: 1
   numVariations: 3
+  reverseClockwiseOrderCopies: 0
+  dontRotateBackFinalPenPaths: 0
   variationColumns: 3
   dbugDrawing: 0
   dbugStripeInterval: 44
-  reverseClockwiseOrderCopies: 0
-  dontRotateBackFinalPenPaths: 0
   _baseStripeDirection: {x: 0, y: 1}
   baseStripeAngleRadians: 0
   deriveLineWidthFromPenWidth: 0
@@ -3936,7 +3938,6 @@ MonoBehaviour:
   yAxisInverted: 1
   canvas: {fileID: 2800000, guid: 409af4754c2580e45a545025bb2fbf1d, type: 3}
   mat: {fileID: 2100000, guid: 99fcef1456d7d024a9c8fbbb15169f00, type: 2}
-  showWithLineRenderers: 1
   pathDisplayPrefab: {fileID: 114382524412442938, guid: acc0075ea2f34d04b9b154bb63a98612,
     type: 2}
   progressText: {fileID: 1052580256}
