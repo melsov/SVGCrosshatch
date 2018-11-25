@@ -1,0 +1,171 @@
+﻿SolveSubproblemBorderProblems.obj : error LNK2001: unresolved external symbol __imp__wassert
+TrimCandidateSet.obj : error LNK2001: unresolved external symbol __imp__wassert
+WriteTour.obj : error LNK2001: unresolved external symbol __imp__wassert
+SolveDelaunaySubproblems.obj : error LNK2001: unresolved external symbol __imp__wassert
+SolveKCenterSubproblems.obj : error LNK2001: unresolved external symbol __imp__wassert
+SolveKMeansSubproblems.obj : error LNK2001: unresolved external symbol __imp__wassert
+SolveSFCSubproblems.obj : error LNK2001: unresolved external symbol __imp__wassert
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp__wassert
+ReadPenalties.obj : error LNK2001: unresolved external symbol __imp__wassert
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp__wassert
+SFCTour.obj : error LNK2001: unresolved external symbol __imp__wassert
+Minimum1TreeCost.obj : error LNK2001: unresolved external symbol __imp__wassert
+PatchCycles.obj : error LNK2001: unresolved external symbol __imp__wassert
+ReadCandidates.obj : error LNK2001: unresolved external symbol __imp__wassert
+ReadLine.obj : error LNK2001: unresolved external symbol __imp__wassert
+GreedyTour.obj : error LNK2001: unresolved external symbol __imp__wassert
+Heap.obj : error LNK2001: unresolved external symbol __imp__wassert
+KSwapKick.obj : error LNK2001: unresolved external symbol __imp__wassert
+LinKernighan.obj : error LNK2001: unresolved external symbol __imp__wassert
+Flip_SL.obj : error LNK2001: unresolved external symbol __imp__wassert
+Flip_SSL.obj : error LNK2001: unresolved external symbol __imp__wassert
+GenerateCandidates.obj : error LNK2001: unresolved external symbol __imp__wassert
+Genetic.obj : error LNK2001: unresolved external symbol __imp__wassert
+BuildKDTree.obj : error LNK2001: unresolved external symbol __imp__wassert
+CreateQuadrantCandidateSet.obj : error LNK2001: unresolved external symbol __imp__wassert
+Delaunay.obj : error LNK2001: unresolved external symbol __imp__wassert
+Flip.obj : error LNK2001: unresolved external symbol __imp__wassert
+AddCandidate.obj : error LNK2001: unresolved external symbol __imp__wassert
+AddExtraCandidates.obj : error LNK2001: unresolved external symbol __imp__wassert
+AdjustCandidateSet.obj : error LNK2001: unresolved external symbol __imp__wassert
+AllocateStructures.obj : error LNK2001: unresolved external symbol __imp__wassert
+SolveKMeansSubproblems.obj : error LNK2001: unresolved external symbol __imp_calloc
+WriteTour.obj : error LNK2001: unresolved external symbol __imp_calloc
+PatchCycles.obj : error LNK2001: unresolved external symbol __imp_calloc
+ReadCandidates.obj : error LNK2001: unresolved external symbol __imp_calloc
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_calloc
+SolveKCenterSubproblems.obj : error LNK2001: unresolved external symbol __imp_calloc
+AddCandidate.obj : error LNK2001: unresolved external symbol __imp_calloc
+AdjustCandidateSet.obj : error LNK2001: unresolved external symbol __imp_calloc
+AllocateStructures.obj : error LNK2001: unresolved external symbol __imp_calloc
+Delaunay.obj : error LNK2001: unresolved external symbol __imp_calloc
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_realloc
+SolveDelaunaySubproblems.obj : error LNK2001: unresolved external symbol __imp_realloc
+TrimCandidateSet.obj : error LNK2001: unresolved external symbol __imp_realloc
+AddCandidate.obj : error LNK2001: unresolved external symbol __imp_realloc
+AdjustCandidateSet.obj : error LNK2001: unresolved external symbol __imp_realloc
+ReadLine.obj : error LNK2001: unresolved external symbol __imp_realloc
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_realloc
+SolveSubproblemBorderProblems.obj : error LNK2001: unresolved external symbol __imp_free
+WriteTour.obj : error LNK2001: unresolved external symbol __imp_free
+SolveKCenterSubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+SolveKMeansSubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+SolveRoheSubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+SolveSFCSubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_free
+SFCTour.obj : error LNK2001: unresolved external symbol __imp_free
+SolveDelaunaySubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+SolveKarpSubproblems.obj : error LNK2001: unresolved external symbol __imp_free
+KSwapKick.obj : error LNK2001: unresolved external symbol __imp_free
+PatchCycles.obj : error LNK2001: unresolved external symbol __imp_free
+ReadLine.obj : error LNK2001: unresolved external symbol __imp_free
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_free
+FindTour.obj : error LNK2001: unresolved external symbol __imp_free
+FreeStructures.obj : error LNK2001: unresolved external symbol __imp_free
+Genetic.obj : error LNK2001: unresolved external symbol __imp_free
+GreedyTour.obj : error LNK2001: unresolved external symbol __imp_free
+AddExtraCandidates.obj : error LNK2001: unresolved external symbol __imp_free
+AllocateStructures.obj : error LNK2001: unresolved external symbol __imp_free
+CreateQuadrantCandidateSet.obj : error LNK2001: unresolved external symbol __imp_free
+Delaunay.obj : error LNK2001: unresolved external symbol __imp_free
+SolveKMeansSubproblems.obj : error LNK2001: unresolved external symbol __imp_malloc
+SolveSFCSubproblems.obj : error LNK2001: unresolved external symbol __imp_malloc
+SolveSubproblemBorderProblems.obj : error LNK2001: unresolved external symbol __imp_malloc
+WriteTour.obj : error LNK2001: unresolved external symbol __imp_malloc
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_malloc
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_malloc
+SFCTour.obj : error LNK2001: unresolved external symbol __imp_malloc
+SolveDelaunaySubproblems.obj : error LNK2001: unresolved external symbol __imp_malloc
+Heap.obj : error LNK2001: unresolved external symbol __imp_malloc
+KSwapKick.obj : error LNK2001: unresolved external symbol __imp_malloc
+PatchCycles.obj : error LNK2001: unresolved external symbol __imp_malloc
+ReadLine.obj : error LNK2001: unresolved external symbol __imp_malloc
+Delaunay.obj : error LNK2001: unresolved external symbol __imp_malloc
+GenerateCandidates.obj : error LNK2001: unresolved external symbol __imp_malloc
+Genetic.obj : error LNK2001: unresolved external symbol __imp_malloc
+GreedyTour.obj : error LNK2001: unresolved external symbol __imp_malloc
+AddExtraCandidates.obj : error LNK2001: unresolved external symbol __imp_malloc
+AllocateStructures.obj : error LNK2001: unresolved external symbol __imp_malloc
+BuildKDTree.obj : error LNK2001: unresolved external symbol __imp_malloc
+CreateQuadrantCandidateSet.obj : error LNK2001: unresolved external symbol __imp_malloc
+Genetic.obj : error LNK2001: unresolved external symbol sqrt
+GeoConversion.obj : error LNK2001: unresolved external symbol sqrt
+AllocateStructures.obj : error LNK2001: unresolved external symbol sqrt
+Ascent.obj : error LNK2001: unresolved external symbol sqrt
+Distance.obj : error LNK2001: unresolved external symbol sqrt
+Distance_SPECIAL.obj : error LNK2001: unresolved external symbol sqrt
+BestKOptMove.obj : error LNK2019: unresolved external symbol memcpy referenced in function BestKOptMove
+PatchCycles.obj : error LNK2001: unresolved external symbol memcpy
+SolveSFCSubproblems.obj : error LNK2001: unresolved external symbol ceil
+SolveTourSegmentSubproblems.obj : error LNK2001: unresolved external symbol ceil
+C.obj : error LNK2001: unresolved external symbol ceil
+Distance.obj : error LNK2001: unresolved external symbol ceil
+SolveKCenterSubproblems.obj : error LNK2001: unresolved external symbol ceil
+SolveKMeansSubproblems.obj : error LNK2001: unresolved external symbol ceil
+CreateQuadrantCandidateSet.obj : error LNK2019: unresolved external symbol memset referenced in function CreateNearestNeighborCandidateSet
+Delaunay.obj : error LNK2019: unresolved external symbol __imp_nextafterf referenced in function delaunay
+SFCTour.obj : error LNK2001: unresolved external symbol __imp_qsort
+SolveDelaunaySubproblems.obj : error LNK2001: unresolved external symbol __imp_qsort
+Delaunay.obj : error LNK2001: unresolved external symbol __imp_qsort
+GreedyTour.obj : error LNK2001: unresolved external symbol __imp_qsort
+KSwapKick.obj : error LNK2001: unresolved external symbol __imp_qsort
+Sequence.obj : error LNK2001: unresolved external symbol __imp_qsort
+Distance.obj : error LNK2019: unresolved external symbol acos referenced in function Distance_GEO
+Distance.obj : error LNK2019: unresolved external symbol atan referenced in function Meeus
+Distance.obj : error LNK2019: unresolved external symbol atan2 referenced in function Distance_GEOM
+GeoConversion.obj : error LNK2001: unresolved external symbol atan2
+Distance.obj : error LNK2019: unresolved external symbol cos referenced in function Distance_GEO
+GeoConversion.obj : error LNK2001: unresolved external symbol cos
+Distance.obj : error LNK2019: unresolved external symbol sin referenced in function Distance_GEOM
+GeoConversion.obj : error LNK2001: unresolved external symbol sin
+eprintf.obj : error LNK2019: unresolved external symbol __imp_exit referenced in function eprintf
+eprintf.obj : error LNK2019: unresolved external symbol __imp___acrt_iob_func referenced in function eprintf
+printff.obj : error LNK2001: unresolved external symbol __imp___acrt_iob_func
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp___acrt_iob_func
+WriteTour.obj : error LNK2019: unresolved external symbol __imp___stdio_common_vfprintf referenced in function WriteTour
+eprintf.obj : error LNK2001: unresolved external symbol __imp___stdio_common_vfprintf
+printff.obj : error LNK2001: unresolved external symbol __imp___stdio_common_vfprintf
+WriteCandidates.obj : error LNK2001: unresolved external symbol __imp___stdio_common_vfprintf
+WritePenalties.obj : error LNK2001: unresolved external symbol __imp___stdio_common_vfprintf
+fscanint.obj : error LNK2019: unresolved external symbol __imp_getc referenced in function fscanint
+fscanint.obj : error LNK2019: unresolved external symbol __imp_ungetc referenced in function fscanint
+ReadLine.obj : error LNK2001: unresolved external symbol __imp_ungetc
+fscanint.obj : error LNK2019: unresolved external symbol __imp_isdigit referenced in function fscanint
+fscanint.obj : error LNK2019: unresolved external symbol __imp_isspace referenced in function fscanint
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_isspace
+GeoConversion.obj : error LNK2019: unresolved external symbol asin referenced in function XYZ2GEO
+GetTime.obj : error LNK2019: unresolved external symbol __imp_clock referenced in function GetTime
+LKHmain.obj : error LNK2019: unresolved external symbol __imp_system referenced in function main
+printff.obj : error LNK2019: unresolved external symbol __imp_fflush referenced in function printff
+WriteCandidates.obj : error LNK2001: unresolved external symbol __imp_fclose
+WritePenalties.obj : error LNK2001: unresolved external symbol __imp_fclose
+WriteTour.obj : error LNK2001: unresolved external symbol __imp_fclose
+ReadCandidates.obj : error LNK2001: unresolved external symbol __imp_fclose
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_fclose
+ReadPenalties.obj : error LNK2001: unresolved external symbol __imp_fclose
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_fclose
+WriteCandidates.obj : error LNK2001: unresolved external symbol __imp_fopen
+WritePenalties.obj : error LNK2001: unresolved external symbol __imp_fopen
+WriteTour.obj : error LNK2001: unresolved external symbol __imp_fopen
+ReadCandidates.obj : error LNK2001: unresolved external symbol __imp_fopen
+ReadParameters.obj : error LNK2001: unresolved external symbol __imp_fopen
+ReadPenalties.obj : error LNK2001: unresolved external symbol __imp_fopen
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_fopen
+ReadLine.obj : error LNK2019: unresolved external symbol __imp_fgetc referenced in function ReadLine
+ReadParameters.obj : error LNK2019: unresolved external symbol __imp_toupper referenced in function ReadParameters
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_toupper
+ReadParameters.obj : error LNK2019: unresolved external symbol __imp___stdio_common_vsscanf referenced in function sscanf
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp___stdio_common_vsscanf
+ReadParameters.obj : error LNK2019: unresolved external symbol __imp_strncmp referenced in function ReadParameters
+ReadParameters.obj : error LNK2019: unresolved external symbol __imp_strtok referenced in function GetFileName
+ReadProblem.obj : error LNK2001: unresolved external symbol __imp_strtok
+ReadParameters.obj : error LNK2019: unresolved external symbol strcmp referenced in function ReadParameters
+ReadProblem.obj : error LNK2001: unresolved external symbol strcmp
+ReadProblem.obj : error LNK2019: unresolved external symbol __imp___stdio_common_vfscanf referenced in function fscanf
+SolveDelaunaySubproblems.obj : error LNK2019: unresolved external symbol __imp_bsearch referenced in function DelaunayClustering
+WriteTour.obj : error LNK2019: unresolved external symbol __imp___stdio_common_vsprintf referenced in function sprintf
+WriteTour.obj : error LNK2019: unresolved external symbol strstr referenced in function WriteTour
+WriteTour.obj : error LNK2019: unresolved external symbol __imp_strncpy referenced in function WriteTour
+WriteTour.obj : error LNK2019: unresolved external symbol __imp__ctime64 referenced in function WriteTour
+WriteTour.obj : error LNK2019: unresolved external symbol __imp__time64 referenced in function WriteTour
+\\Mac\Home\Desktop\LKH2-site\LKHWin-2.0.7\x64\Debug\lkh.exe : fatal error LNK1120: 42 unresolved externals

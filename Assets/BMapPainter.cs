@@ -17,8 +17,8 @@ namespace SCDisplay
         SCBitmap map;
         Box2 viewBox;
         float scaleToMap;
-        bool flipX = true;
-        bool flipY = false;
+        public bool flipX = true;
+        public bool flipY = false;
         DbugSettings dbugSettings;
         MachineConfig machineConfig;
 
@@ -36,7 +36,8 @@ namespace SCDisplay
             }
         }
 
-        public BMapPainter(Texture2D tex, Box2 viewBox) {
+        public BMapPainter(Texture2D tex, Box2 viewBox)
+        {
             map = new SCBitmap(tex);
             this.viewBox = viewBox;
             scaleToMap = viewBox.getFitScale(map.size);

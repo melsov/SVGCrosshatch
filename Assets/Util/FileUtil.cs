@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using UnityEngine;
 
 public static class FileUtil
 {
@@ -15,6 +18,52 @@ public static class FileUtil
     public static bool fullPathExists(string fileName, string folderPath, out string combined) {
         combined = Path.Combine(folderPath, fileName);
         return File.Exists(combined);
+    }
+
+    public static string CreateFolderInAssetsIfNE(string f)
+    {
+#if UNITY_EDITOR
+        try
+        {
+            string guid = AssetDatabase.CreateFolder("Assets", f);
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            return path;
+        } 
+        catch
+        {
+            Debug.Log("something went wrong creating folder " + f);
+        }
+#endif
+        return null;
+    }
+
+    public static void RunShellCMD(string command, string subPath = "", bool fromAssetsFolder = true, bool asynchronously = false)
+    {
+        string wdir = @"C:\";
+        if (fromAssetsFolder)
+        {
+            wdir = Application.dataPath;
+        }
+        if (!string.IsNullOrEmpty(subPath))
+        {
+            wdir += "/" + subPath;
+        }
+
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+        startInfo.FileName = "cmd.exe";
+        startInfo.WorkingDirectory = wdir;
+
+        startInfo.Arguments = "/C " + command;
+        process.StartInfo = startInfo;
+
+        process.Start();
+
+        if (asynchronously)
+        {
+            process.WaitForExit();
+        }
     }
 
     public static bool hasSVGExtension(string fileName) {
@@ -100,6 +149,28 @@ public static class FileUtil
 
         validFullPath = "";
         return false;
+    }
+
+    public static string FormatApplicationDataPathIfNE(string fileName, string extension)
+    {
+        if (File.Exists(fileName))
+        {
+            return fileName;
+        }
+        string fullFPath = fileName;
+        if (!fullFPath.StartsWith("Data/"))
+        {
+            fullFPath = string.Format("Data/{0}", fullFPath);
+        }
+        if (!fullFPath.EndsWith(extension))
+        {
+            if(!extension.StartsWith("."))
+            {
+                extension = "." + extension;
+            }
+            fullFPath = string.Format("{0}{1}", fullFPath, extension);
+        }
+        return Application.dataPath + "/" + fullFPath;
     }
 
 }

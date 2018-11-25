@@ -22,6 +22,8 @@ namespace g3
 
         public Vector2f upperLeft { get { return new Vector2f(min.x, max.y); } }
 
+        public Vector2f center { get { return min + size / 2f; } }
+
         public IEnumerable<Vector2f> getHorizontalLines(float yIncr = 1f) {
             for(float y = min.y; y < max.y; y += yIncr) {
                 yield return new Vector2f(min.x, y);
@@ -60,6 +62,14 @@ namespace g3
 
         public override string ToString() {
             return string.Format("ViewBox: min: {0} max: {1}", min.ToString(), max.ToString());
+        }
+
+        public static void GizmosDraw(Box2f b)
+        {
+            Gizmos.DrawLine(b.min, b.lowerRight);
+            Gizmos.DrawLine(b.lowerRight, b.max);
+            Gizmos.DrawLine(b.max, b.upperLeft);
+            Gizmos.DrawLine(b.upperLeft, b.min);
         }
     }
 }

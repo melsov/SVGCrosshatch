@@ -163,8 +163,10 @@ namespace SCParse
             storage.Add(ccs.name, ccs);
         }
 
-        public void updatePath(SvgParser.SvgPath path) {
-            if(path._class != null && storage.ContainsKey(path._class)) {
+        public void updatePath(SvgParser.SvgPath path)
+        {
+            if(path._class != null && storage.ContainsKey(path._class))
+            {
                 path.updateWith(storage[path._class]);
             }
             else {

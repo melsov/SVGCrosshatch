@@ -28,7 +28,9 @@ namespace SCGenerator
             int lineCount = stripeFieldConfig.lineCountForLightRatio(lightRatio);
             float darkRatio = 1f - lightRatio;
 
-            if (lineCount == 0) { sfield = new StripeField(); return false; }
+            if (lineCount == 0) {
+                sfield = new StripeField(); return false;
+            }
 
             Vector2f primary = pdata.bounds.tallerThanWide ? pdata.highest - pdata.lowest : pdata.rightMost - pdata.leftMost;
 
@@ -37,9 +39,6 @@ namespace SCGenerator
 
             Vector2f sz = pdata.bounds.size;
             float diamondAngle = Mathf.PI / 6f; // priAngle + pdata.bounds.smallerOverLargerDimension * Mathf.PI / 2.5f; //TODO: determine angle somehow
-
-
-            //throw new Exception("makes almost all lines go away on sphere!");
 
             // make sure diamond is sub 90 degrees?
 
@@ -52,7 +51,6 @@ namespace SCGenerator
                 sfield = new StripeField()
                 {
                     angleRadians = priAngle,
-                    //direction = primary.Normalized,
                     interval = stripeFieldConfig.lineWidth
                 };
                 return true;
@@ -68,7 +66,6 @@ namespace SCGenerator
             StripeField _next = new StripeField()
             {
                 angleRadians = diamondAngle,
-                //direction = secondary,
                 interval = interval
             };
 
@@ -80,7 +77,6 @@ namespace SCGenerator
             sfield = new StripeField()
             {
                 angleRadians = priAngle,
-                //direction = primary,
                 interval = interval,
                 next = _next
             };

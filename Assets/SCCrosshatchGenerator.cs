@@ -36,6 +36,8 @@ namespace SCGenerator
         public bool hasColor {
             get { return color != null; }
         }
+
+        public static implicit operator Vector2f(PenMove pm) { return pm.destination; }
     }
 
     public class NullableColor
@@ -59,7 +61,8 @@ namespace SCGenerator
         public static implicit operator NullableColor(Color c) { return new NullableColor(c); }
     }
 
-    public class PenDrawingPath  {
+    public class PenDrawingPath
+    {
 
         private List<PenMove> moves = new List<PenMove>();
 
@@ -89,7 +92,11 @@ namespace SCGenerator
             Add(new PenMove() { destination = to, up = true });
         }
 
-        public void addDrawMove(Vector2f start, Vector2f end, Color c) {
+        public void addDrawMove(Vector2f to) {
+            Add(new PenMove() { destination = to, up = false });
+        }
+
+        public void addDownUpDrawMove(Vector2f start, Vector2f end, Color c) {
             Add(new PenMove() { destination = start, up = false, color = c });
             Add(new PenMove() { destination = end, up = true });
         }
@@ -104,48 +111,63 @@ namespace SCGenerator
     }
 
 
-    public class SCCrosshatchGenerator
+    public class SCCrosshatchGenerator : SCBasePenPathGenerator
     {
 
-        public MachineConfig machineConfig { get; private set; }
+        //public MachineConfig machineConfig { get; private set; }
         public HatchConfig hatchConfig { get; private set; }
 
-        float viewBoxToPaperScale;
+        //protected float viewBoxToPaperScale;
 
-        float epsilonSVG;
-        private SCSvgFileData _svgFileData;
+        protected float epsilonSVG;
 
-        //private static bool DEBUG_DRAWING = false;
-        private DbugSettings dbugSettings;
+        protected SCSvgFileData _svgFileData;
+
+        protected DbugSettings dbugSettings;
+
+        StripedPathSet spSet;
+
+        public void UsePathSet(StripedPathSet _spSet)
+        {
+            spSet = _spSet;
+        }
 
         public SCCrosshatchGenerator(
             MachineConfig machineConfig, 
             HatchConfig hatchConfig, 
             SCSvgFileData scSvgFileData,
             Box2 svgViewBox
-            ) {
+            ) : base(machineConfig, svgViewBox) {
 
-            this.machineConfig = machineConfig;
+            //this.machineConfig = machineConfig;
+            //viewBoxToPaperScale = svgViewBox.getFitScale(machineConfig.paper.size);
+
             this.hatchConfig = hatchConfig;
             this._svgFileData = scSvgFileData;
-            viewBoxToPaperScale = svgViewBox.getFitScale(machineConfig.paper.size);
             epsilonSVG = 1f / Mathf.Max(svgViewBox.size.y, svgViewBox.size.x) * 10f;
 
             this.dbugSettings = GameObject.FindObjectOfType<DbugSettings>();
-
-           
         }
 
-        public IEnumerable<PenDrawingPath> generate(StripedPathSet spSet) {
 
-            foreach (var stripedPath in spSet.iter()) {
+
+
+        //
+        // Overrideable
+        //
+        public override IEnumerable<PenDrawingPath> generate() //StripedPathSet spSet) // spSet now a mem var. TODO: allow TSP version to generate without one
+        {
+
+            foreach (var stripedPath in spSet.iter())
+            {
 
                 foreach(PenDrawingPath ppath in crosshatches(stripedPath)) {
                     yield return ppath;
                 }
 
-
-                if (dbugSettings.pathOutlines) {
+                //DEBUG
+                if (dbugSettings.pathOutlines)
+                {
                     foreach (PenDrawingPath ppath in outline(stripedPath)) {
                         yield return ppath;
                     }
@@ -155,14 +177,17 @@ namespace SCGenerator
 
         }
 
-        IEnumerable<PenDrawingPath> crosshatches(StripedPath stripedPath) {
+
+        #region crosshatch-func
+
+        IEnumerable<PenDrawingPath> crosshatches(StripedPath stripedPath)
+        {
 
             Matrix2f inverseRotation;
             PathData pdata;
 
-
-            for(var stripeField = stripedPath.stripeField; stripeField != null; stripeField = stripeField.next) {
-
+            for(var stripeField = stripedPath.stripeField; stripeField != null; stripeField = stripeField.next)
+            {
 
                 inverseRotation = stripeField.rotation.Inverse();
                 if(dbugSettings.dontRotateBackFinalPenPaths) {
@@ -188,8 +213,6 @@ namespace SCGenerator
                             continue;
                             //break; // want?
                         }
-
-
                         
 
                         float closestXDelta = float.MaxValue;
@@ -209,32 +232,24 @@ namespace SCGenerator
 
                         if (closestXDelta < float.MaxValue) {
                             PenDrawingPath penPath = new PenDrawingPath();
-                            // travel move to leftIntersection
-                            //if (firstStripe) {
-                            //    firstStripe = false;
-                            //    penPath.addTravelMode((inverseRotation * leftIntersection) * viewBoxToPaperScale);
-                            //}
-                            penPath.addDrawMove(
+                            
+                            penPath.addDownUpDrawMove(
                                 (inverseRotation * leftIntersection) * viewBoxToPaperScale,
                                 (inverseRotation * new Vector2f(leftIntersection.x + closestXDelta, y)) * viewBoxToPaperScale, 
                                 Color.black);
                             yield return penPath;
-                            //yield return twoPointPenPath(
-                            //    leftIntersection,
-                            //    new Vector2f(leftIntersection.x + closestXDelta, y),
-                            //    inverseRotation,
-                            //    dbugSettings.dbugDrawing ? ColorUtil.roygbivMod(i) : Color.black);
+                           
                         }
                     }
 
                     lastEnterEdgeIndex = i;
-
                 }
-
             }
         }
 
-#region debug-shapes
+        #endregion
+
+        #region debug-shapes
         private PenDrawingPath arrowToNextDBUG(int i, PathData pdata, Matrix2f rot) {
             var pp = new PenDrawingPath();
             Vector2f last = Vector2f.Zero;
@@ -281,7 +296,7 @@ namespace SCGenerator
         }
         private PenDrawingPath twoPointPenPath(Vector2f start, Vector2f end, Matrix2f rot, Color c) {
             PenDrawingPath pp = new PenDrawingPath();
-            pp.addDrawMove((rot * start) * viewBoxToPaperScale, (rot * end) * viewBoxToPaperScale, c);
+            pp.addDownUpDrawMove((rot * start) * viewBoxToPaperScale, (rot * end) * viewBoxToPaperScale, c);
             //pp.Add(new PenMove() { destination = (rot * start) * viewBoxToPaperScale, up = false, color = c });
             //pp.Add(new PenMove() { destination = (rot * end) * viewBoxToPaperScale, up = true });
             return pp;

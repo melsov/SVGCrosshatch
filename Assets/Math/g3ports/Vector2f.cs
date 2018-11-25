@@ -132,6 +132,17 @@ namespace g3
             return v1.AngleR(v2);
         }
 
+        public float SafeSlope {
+            get {
+                if(Math.Abs(x) < Mathf.Epsilon) { return float.MaxValue * Mathf.Sign(x) * Mathf.Sign(y); }
+                return y / x;
+            }
+        }
+
+        public float Slope {
+            get { return y / x; }
+        }
+
 
 
 		public float DistanceSquared(Vector2f v2) {
@@ -200,6 +211,11 @@ namespace g3
 			return new Vector2f(a.x / b.x, a.y / b.y);
 		}
 
+        public Vector2f Abs()
+        {
+            return new Vector2f(Math.Abs(x), Math.Abs(y));
+        }
+
 
         public static bool operator ==(Vector2f a, Vector2f b)
         {
@@ -258,6 +274,49 @@ namespace g3
             return string.Format("{0:F8} {1:F8}", x, y);
         }
 
+        public Vector2i ToVector2i()
+        {
+            return new Vector2i((int)x, (int)y);
+        }
+
+        public bool ComponentsGreaterThan(Vector2f other)
+        {
+            return x > other.x && y > other.y;
+        }
+
+        public bool ComponentsLessThan(Vector2f other)
+        {
+            return x < other.x && y < other.y;
+        }
+
+        public bool EitherComponentGreaterThan(Vector2f other)
+        {
+            return x > other.x || y > other.y;
+        }
+
+        public bool EitherComponentLessThan(Vector2f other)
+        {
+            return x < other.x || y < other.y;
+        }
+
+        public IEnumerable<Vector2f> GridPoints(float unit)
+        {
+            unit = Math.Abs(unit);
+            float xIncr = Math.Sign(x) * unit;
+            float yIncr = Math.Sign(y) * unit;
+            var limit = Abs();
+            var cursor = Vector2f.Zero;
+            for(float x = 0; x < limit.x; x+= unit)
+            {
+                for(float y=0; y < limit.y; y+= unit)
+                {
+                    yield return cursor;
+                    cursor.y += yIncr;
+                }
+                cursor.y = 0;
+                cursor.x += xIncr;
+            }
+        }
 
 
 

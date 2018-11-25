@@ -28,7 +28,8 @@ namespace SCGenerator
         private DiamondCalculator diamondCalculator;
         private DbugSettings dbugSettings;
 
-        public StripedPathSet(SvgParser.SvgPath path, StripeFieldConfig stripeFieldConfig, SCSvgFileData _svgFileData) {
+        public StripedPathSet(SvgParser.SvgPath path, StripeFieldConfig stripeFieldConfig, SCSvgFileData _svgFileData)
+        {
             this.stripeFieldConfig = stripeFieldConfig;
             this._svgFileData = _svgFileData;
             diamondCalculator = new DiamondCalculator(stripeFieldConfig);
@@ -36,11 +37,13 @@ namespace SCGenerator
             setup(path);
         }
 
-        private void setup(SvgParser.SvgPath path) {
+        private void setup(SvgParser.SvgPath path)
+        {
             //setupFields(path);
             paths = new List<SvgParser.SvgPath>();
 
-            for(var it = path; it != null; it = it.next) {
+            for(var it = path; it != null; it = it.next)
+            {
                 //rotated copies
                 if(dbugSettings.makeVariations) {
                     addRotatedCopies(it);
@@ -57,7 +60,8 @@ namespace SCGenerator
 
 #region test-data-generation
 
-        private void addRotatedCopies(SvgParser.SvgPath it, int copyOffset = 0) {
+        private void addRotatedCopies(SvgParser.SvgPath it, int copyOffset = 0)
+        {
             PathData pdata = new PathData(it, _svgFileData.isYAxisInverted);
 
             int iters = dbugSettings.numVariations;
@@ -68,8 +72,8 @@ namespace SCGenerator
             }
         }
 
-        private SvgParser.SvgPath rotateAndShift(PathData pdata, float radians, Vector2f placementCoord) {
-
+        private SvgParser.SvgPath rotateAndShift(PathData pdata, float radians, Vector2f placementCoord)
+        {
             Matrix2f rot = Matrix2f.Identity;
             if (dbugSettings.variationType == VariationType.RotatePath) { rot.SetToRotationRad(radians); }
             float[] pts = new float[pdata.path.pts.Length];
@@ -128,6 +132,20 @@ namespace SCGenerator
             for(int i=startIndex; i < Count; ++i) {
                 yield return this[i];
             }
+        }
+
+        public List<Vector2f> AllPathsToPoints()
+        {
+            var points = new List<Vector2f>();
+            for(int j=0; j < Count; ++j)
+            {
+                var sps = this[j];
+                for (int i = 0; i < sps.path.npts; ++i)
+                {
+                    points.Add(sps.path[i]);
+                }
+            }
+            return points;
         }
     }
 }

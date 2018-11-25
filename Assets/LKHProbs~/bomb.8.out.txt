@@ -1,0 +1,17 @@
+NAME : bomb.8.tour
+COMMENT : Length = 479929
+COMMENT : Found by LKH [Keld Helsgaun] At some point in time
+TYPE : TOUR
+DIMENSION : TODO add valid length
+TOUR_SECTION
+1
+3
+2
+5
+9
+8
+7
+6
+4
+-1
+EOF

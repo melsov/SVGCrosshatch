@@ -148,6 +148,11 @@ namespace g3
         {
             return string.Format("{0} {1}", x, y);
         }
+
+        public static implicit operator Vector2f(Vector2i v)
+        {
+            return new Vector2f(v.x, v.y);
+        }
     }
 
 

@@ -1,0 +1,8 @@
+
+PROBLEM_FILE = tempo_prob_file.tsp
+OPTIMUM = 5
+MOVE_TYPE = 5
+PATCHING_C = 3
+PATCHING_A = 2
+RUNS = 10
+OUTPUT_TOUR_FILE=yay_output.txt

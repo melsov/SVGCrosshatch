@@ -1,0 +1,17 @@
+NAME : GeneratedProblem.1967.tour
+COMMENT : Length = 1967
+COMMENT : Found by LKH [Keld Helsgaun] Sat Nov 24 14:17:57 2018
+TYPE : TOUR
+DIMENSION : 9
+TOUR_SECTION
+1
+2
+3
+6
+8
+9
+7
+4
+5
+-1
+EOF

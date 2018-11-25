@@ -12,6 +12,8 @@ using g3;
 using UnityEngine.UI;
 using SCGCode;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
+using SCPointGenerator;
 
 public class SVGCrosshatch : MonoBehaviour {
 
@@ -46,6 +48,17 @@ public class SVGCrosshatch : MonoBehaviour {
     Text progressText;
 
     [SerializeField]
+    Text timeScaleCommentText;
+
+    void updateTimeScaleComment()
+    {
+        if (generator != null)
+        {
+            timeScaleCommentText.text = generator.GetProcessIntensityComments();
+        }
+    }
+
+    [SerializeField]
     private bool progressUpdates;
 
     private string DataFolder { get { return string.Format("{0}/Data/", Application.dataPath); } }
@@ -54,19 +67,33 @@ public class SVGCrosshatch : MonoBehaviour {
 
     DbugSettings dbugSettings;
 
+    enum GeneratorType
+    {
+        Crosshatch, TSPCrosshatch
+    }
+    [SerializeField]
+    GeneratorType generatorType;
+
+    [SerializeField, Header("Get points from an image, instead of an SVG file")]
+    bool useBitMapPointGenerator;
+    
+    [SerializeField]
+    BitMapPointGenerator bitMapPointGenerator;
+
+    public BitMapPointGenerator GetBitMapPointGenerator() { return bitMapPointGenerator; }
+
+    SCBasePenPathGenerator generator;
+
+
+
+    
+
     public string svgFullPath {
         get {
-            if(File.Exists(svgFile)) {
-                return svgFile;
+            if (!File.Exists(svgFile))
+            {
+                svgFile = FileUtil.FormatApplicationDataPathIfNE(svgFile, "svg");
             }
-            string svgFName = svgFile; 
-            if(!svgFName.StartsWith("Data/")) {
-                svgFName = string.Format("Data/{0}", svgFName);
-            }
-            if(!svgFName.EndsWith(".svg")) {
-                svgFName = string.Format("{0}.svg", svgFName);
-            }
-            svgFile = Application.dataPath + "/" + svgFName;
             return svgFile;
         }
         set {
@@ -106,7 +133,7 @@ public class SVGCrosshatch : MonoBehaviour {
 
     private IEnumerator lateStart() {
         yield return new WaitForSeconds(.2f);
-        Redraw();
+        // Redraw();
     }
 
     public string saveFullPath {
@@ -125,7 +152,10 @@ public class SVGCrosshatch : MonoBehaviour {
         return SvgParser.SvgParse(File.ReadAllText(filePath));
     }
 
-    void Setup() {
+
+    void Setup()
+    {
+
         finished = false;
         canvasClone = Instantiate(canvas);
         mat.mainTexture = canvasClone;
@@ -133,7 +163,6 @@ public class SVGCrosshatch : MonoBehaviour {
         gCodeWriter = FindObjectOfType<GCodeWriter>();
         dbugSettings = FindObjectOfType<DbugSettings>();
         painter = new BMapPainter(canvasClone, machineConfig.paper);
-      
     }
 
     private void clear() {
@@ -149,41 +178,100 @@ public class SVGCrosshatch : MonoBehaviour {
     public void Redraw() {
         clear();
         Setup();
+        CreateGenerator();
+        updateTimeScaleComment();
         _Main();
     }
 
-    void _Main() {
-        CSSLookup lookup = SCCSSParser.Parse(svgFullPath);
+    void _Main()
+    {
+        try
+        {
+
+            setupPainter();
+
+
+            if (progressUpdates)
+            {
+                StartCoroutine(getProgressiveCrosshatches(generator));
+            }
+            else
+            {
+                getCrosshatches(generator);
+            }
+        } 
+        catch(Exception e)
+        {
+            Debug.Log("exception in main: ");
+            Debug.Log(e.ToString());
+
+        }
+    }
+
+    void CreateGenerator()
+    {
+        //SCBasePenPathGenerator generator;
+
         SVGViewBox viewBox = SCCSSParser.ParseViewBox(svgFullPath);
+        CSSLookup lookup = SCCSSParser.Parse(svgFullPath);
 
         SvgParser.SvgPath plist = getSvgPath(svgFullPath);
-        for(var it = plist; it != null; it = it.next) {
+
+        for (var it = plist; it != null; it = it.next)
+        {
             lookup.updatePath(it);
         }
 
-        HatchConfig hatchConfig = new HatchConfig();
         SCSvgFileData _svgFileData = new SCSvgFileData() { isYAxisInverted = yAxisInverted };
         StripeFieldConfig stripeFieldConfig = FindObjectOfType<StripeFieldConfig>();
-        //stripeFieldConfig.setViewBox(viewBox);
-
         StripedPathSet stripedPathSet = new StripedPathSet(plist, stripeFieldConfig, _svgFileData);
-        SCCrosshatchGenerator generator = new SCCrosshatchGenerator(machineConfig, hatchConfig, _svgFileData, viewBox);
 
+        // 
+        // Configure generator
+        //
+        if (generatorType == GeneratorType.Crosshatch)
+        {
+            var crosshatchGenerator = new SCCrosshatchGenerator(machineConfig, new HatchConfig(), _svgFileData, viewBox);
+            crosshatchGenerator.UsePathSet(stripedPathSet);
+            generator = crosshatchGenerator;
+        }
+        else
+        {
+            SCTSPCrosshatchGenerator tspGenerator;
+            if (useBitMapPointGenerator)
+            {
+                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, bitMapPointGenerator.imageBox);
+                tspGenerator.SetTSPPointSets(bitMapPointGenerator.getPoints());
+
+                tspGenerator.BaseFileName = Path.GetFileNameWithoutExtension(bitMapPointGenerator._bmapName);
+                
+            }
+            else
+            {
+                List<Vector2f> points;
+                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, viewBox);
+                points = stripedPathSet.AllPathsToPoints();
+                tspGenerator.AddPoints(points);
+            }
+
+            generator = tspGenerator;
+        }
+
+    }
+
+    void setupPainter()
+    {
         painter.lineWidth = 5f;
         painter.color = new Color(0f, 1f, .9f);
         painter.DrawBox(machineConfig.paper);
         painter.DrawBox(machineConfig.paper.expandUniform(-3f));
         painter.lineWidth = 2f;
         painter.color = Color.black;
+        painter.flipY = !yAxisInverted;
         painter.applyTexture();
-       
-
-        if(progressUpdates) {
-            StartCoroutine(getProgressiveCrosshatches(generator, stripedPathSet));
-        } else {
-            getCrosshatches(generator, stripedPathSet);
-        }
     }
+
+ 
 
     void addPenSubscribers(SCPen pen) {
         if (dbugSettings.paintFromPenMoves) {
@@ -221,12 +309,13 @@ public class SVGCrosshatch : MonoBehaviour {
         finished = true;
     }
 
-    IEnumerator getProgressiveCrosshatches(SCCrosshatchGenerator generator, StripedPathSet stripedPathSet) {
+    IEnumerator getProgressiveCrosshatches(SCBasePenPathGenerator generator)
+    {
         SCPen pen = FindObjectOfType<SCPen>();
         addPenSubscribers(pen);
 
         int count = 0;
-        foreach (PenDrawingPath penPath in generator.generate(stripedPathSet)) {
+        foreach (PenDrawingPath penPath in generator.generate()) {
             pen.makeMoves(penPath);
             if(showWithLineRenderers) { lineRenderPenPath(penPath); }
 
@@ -243,8 +332,9 @@ public class SVGCrosshatch : MonoBehaviour {
     }
 
 
-    void getCrosshatches(SCCrosshatchGenerator generator, StripedPathSet stripedPathSet) {
-        var penIterator = generator.generate(stripedPathSet);
+    void getCrosshatches(SCBasePenPathGenerator generator)
+    {
+        var penIterator = generator.generate();
         SCPen pen = FindObjectOfType<SCPen>();
         addPenSubscribers(pen);
 
