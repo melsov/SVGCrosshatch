@@ -8,13 +8,16 @@ namespace SCGenerator
     public abstract class SCBasePenPathGenerator
     {
         protected float viewBoxToPaperScale = 1f;
+        protected GeneratorConfig generatorConfig;
         protected MachineConfig machineConfig;
 
         public SCBasePenPathGenerator(
             MachineConfig machineConfig,
-            Box2 viewBox
+            Box2 viewBox,
+            GeneratorConfig generatorConfig
             )
         {
+            this.generatorConfig = generatorConfig;
             this.machineConfig = machineConfig;
             viewBoxToPaperScale = viewBox.getFitScale(machineConfig.paper.size);
         }

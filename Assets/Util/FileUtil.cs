@@ -37,7 +37,28 @@ public static class FileUtil
         return null;
     }
 
-    public static void RunShellCMD(string command, string subPath = "", bool fromAssetsFolder = true, bool asynchronously = false)
+    public static System.Diagnostics.Process RunShellCMDFromPath(string command, string workingDirectory, bool asynchronously = false)
+    {
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+        startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
+        startInfo.FileName = "cmd.exe";
+        startInfo.WorkingDirectory = workingDirectory;
+
+        startInfo.Arguments = "/C " + command;
+        process.StartInfo = startInfo;
+
+        process.Start();
+
+        if (!asynchronously)
+        {
+            process.WaitForExit();
+        }
+
+        return process;
+    }
+
+    public static System.Diagnostics.Process RunShellCMD(string command, string subPath = "", bool fromAssetsFolder = true, bool asynchronously = false)
     {
         string wdir = @"C:\";
         if (fromAssetsFolder)
@@ -49,21 +70,8 @@ public static class FileUtil
             wdir += "/" + subPath;
         }
 
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-        startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
-        startInfo.FileName = "cmd.exe";
-        startInfo.WorkingDirectory = wdir;
-
-        startInfo.Arguments = "/C " + command;
-        process.StartInfo = startInfo;
-
-        process.Start();
-
-        if (asynchronously)
-        {
-            process.WaitForExit();
-        }
+        return RunShellCMDFromPath(command, wdir, asynchronously);
+        
     }
 
     public static bool hasSVGExtension(string fileName) {
@@ -96,6 +104,13 @@ public static class FileUtil
         }
 
         return string.Join(glue, elems.Where((s, idx) => idx < elems.Length - 1).ToArray());
+    }
+
+    public static string AppendExtensionIfMissing(string fileName, string ext)
+    {
+        if(fileName.ToLower().EndsWith(ext)) { return fileName; }
+        ext = ext.TrimStart('.');
+        return string.Format("{0}.{1}", fileName, ext);
     }
 
     public static string AppendSVGExtension(string fileName) {

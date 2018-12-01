@@ -32,6 +32,7 @@ namespace SCGCode
         }
 
         public void Reset() {
+            Debug.Log("RESET GCodeWriter***");
             lines.Clear();
         }
 
@@ -39,7 +40,7 @@ namespace SCGCode
 
             List<PenMove> moves = pu.drawPath.GetMoves().ToList();
             if(moves.Count == 0) { return; }
-            if(moves.Count == 1) { Debug.Log("why?"); return; }
+            if(moves.Count == 1) { Debug.LogWarning("why?"); return; }
             PenMove first = moves[0];
 
             if(!machineConfig.isSameXY(cursor, first.destination)) {
@@ -76,7 +77,12 @@ namespace SCGCode
             }
         }
 
-
+        /// <summary>
+        /// Returns gcode to move to destination
+        /// </summary>
+        /// <param name="destination"></param>
+        /// <param name="updown">1 is up</param>
+        /// <returns></returns>
         private string move(Vector2f destination, int updown) {
             cursor = destination;
             return string.Format("G{0} X{1} Y{2} {3}", 
@@ -103,12 +109,28 @@ namespace SCGCode
             //yield return penUpDown(false);
         }
 
-        private IEnumerable<string> returnHome() {
+        private IEnumerable<string> returnHome(bool penDown = false) {
             yield return "(return home)";
             yield return penUpDown(true);
             yield return move(machineConfig.homePositionOffsetMM.toVector2f(), 1);
-            yield return penUpDown(false);
+            if(penDown)
+                yield return penUpDown(false); 
             yield return "(end return home)";
+        }
+
+        private IEnumerable<string> tourPaperBounnds()
+        {
+            yield return "(tour paper bounds)";
+            yield return penUpDown(true);
+            var home = machineConfig.homePositionOffsetMM.toVector2f();
+
+            var corners = new List<Vector2>(machineConfig.paper.corners());
+
+            for(int i = 0; i <= corners.Count; ++i)
+            {
+                yield return move(home + (Vector2f)corners[i % corners.Count], 1);
+            }
+            yield return "(end tour paper bounds)";
         }
 
         public IEnumerable<string> getLines() {
@@ -121,6 +143,11 @@ namespace SCGCode
                 using (StreamWriter outputFile = new StreamWriter(fullPath)) {
                     outputFile.Write(machineConfig.header.ToCharArray());
                     outputFile.WriteLine();
+
+                    foreach(string line in tourPaperBounnds())
+                    {
+                        outputFile.WriteLine(line);
+                    }
 
                     outputFile.WriteLine(@"(Move home)");
                     foreach(string line in moveHome()) {

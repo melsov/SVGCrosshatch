@@ -6,6 +6,7 @@ using SCParse;
 using g3;
 using NanoSvg;
 using UnityEngine;
+using SCUtil;
 
 namespace SCGenerator
 {
@@ -45,8 +46,9 @@ namespace SCGenerator
     {
         public SCTSPCrosshatchGenerator(
             MachineConfig machineConfig,
-            Box2 viewBox) 
-            : base(machineConfig, viewBox)
+            Box2 viewBox,
+            GeneratorConfig generatorConfig) 
+            : base(machineConfig, viewBox, generatorConfig)
         {
         }
 
@@ -94,14 +96,60 @@ namespace SCGenerator
 
         }
 
-        public override IEnumerable<PenDrawingPath> generate() //StripedPathSet spSet)
+        public override IEnumerable<PenDrawingPath> generate() 
         {
+            CMDProcessPool pool = new CMDProcessPool(generatorConfig.MaxTSPThreads);
+            TSPLibProblem[] tsps = new TSPLibProblem[pointSets.Count];
+
+            //
+            // foreach list of points
+            // make a tsp problem. 
+            // add it to the LKH job pool if no output file exists
+            //
             for(int i = 0; i < pointSets.Count; ++i)
             {
-                yield return fromPoints(pointSets[i], i);
+                TSPLibProblem tsp = TSPLibProblem.FromPoints(pointSets[i].GetEnumerator(), BaseFileName + "." + i);
+                if (!tsp.OutputFileExists())
+                {
+                    pool.Add(tsp.GetTSPCommand());
+                }
+                tsps[i] = tsp;
+
+            }
+
+            pool.run();
+
+            // Output files should now exists for all tsp problems
+            // create pen drawing paths from each of them
+            for(int i = 0; i < pointSets.Count; ++i)
+            {
+                yield return fromTSP(tsps[i], pointSets[i]);
             }
         }
 
+        PenDrawingPath fromTSP(TSPLibProblem tsp, List<Vector2f> points)
+        {
+            PenDrawingPath pdpath = new PenDrawingPath();
+
+            bool success = tsp.setIndicesFromOutputFile();
+            Debug.Log("TSP success? " + success);
+            if (success)
+            {
+                for (int i = 0; i < points.Count; ++i)
+                {
+                    pdpath.addDrawMove(points[tsp.indexAt(i)] * viewBoxToPaperScale);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("tsp encountered an error");
+            }
+            Debug.Log("after add pts ");
+            return pdpath;
+
+        }
+
+        /*
         PenDrawingPath fromPoints(List<Vector2f> pointsList, int subscript)
         {
             PenDrawingPath pdpath = new PenDrawingPath();
@@ -128,6 +176,7 @@ namespace SCGenerator
             }
             return pdpath;
         }
+        */
 
 
     }

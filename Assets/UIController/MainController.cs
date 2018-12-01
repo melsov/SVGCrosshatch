@@ -20,13 +20,52 @@ namespace UIController
         [SerializeField]
         InputField savedToField;
 
+        [SerializeField]
+        Toggle bitMapModeToggle;
+
+        [SerializeField]
+        InputField maxCitiesField;
+
         private void Start() {
             svgCrosshatch = FindObjectOfType<SVGCrosshatch>();
-            setInFileField();
+            setup();
         }
 
-        private void setInFileField() {
-            inFileField.text = svgCrosshatch.svgFullPath;
+        private void setup()
+        {
+            setInputFileField();
+            setupCrosshatchConfig();
+        }
+
+        void setupCrosshatchConfig()
+        {
+            bitMapModeToggle.onValueChanged.AddListener(delegate {
+                OnBitMapModeToggled(bitMapModeToggle.isOn);
+            });
+            bitMapModeToggle.isOn = svgCrosshatch.isInBitmapMode;
+            maxCitiesField.text = "" + svgCrosshatch.MaxCities;
+            maxCitiesField.onEndEdit.AddListener(delegate
+            {
+                OnEditMaxCitiesField(maxCitiesField);
+            });
+
+        }
+
+        private void OnEditMaxCitiesField(InputField _maxCitiesField)
+        {
+            try
+            {
+                int m = int.Parse(_maxCitiesField.text);
+                svgCrosshatch.MaxCities = m;
+            } catch
+            {
+            }
+            _maxCitiesField.text = "" + svgCrosshatch.MaxCities;
+        }
+
+        private void setInputFileField()
+        {
+            inFileField.text = svgCrosshatch.inputFilePath;
             if(File.Exists(inFileField.text)) {
                 inFileField.GetComponent<Image>().color = Color.green;
                 fileNameDisplay.text = Path.GetFileName(inFileField.text);
@@ -41,8 +80,13 @@ namespace UIController
         }
 
         public void onEndEditInFileName(string inFileInputField) {
-            svgCrosshatch.svgFullPath = inFileInputField;
-            setInFileField();
+            svgCrosshatch.inputFilePath = inFileInputField;
+            setInputFileField();
+        }
+
+        public void OnBitMapModeToggled(bool useBitmapMode)
+        {
+            print(useBitmapMode);
         }
 
 

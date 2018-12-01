@@ -11,6 +11,7 @@ using UnityEditor;
 
 using System.IO;
 using SCPointGenerator;
+using SCUtil;
 
 namespace SCGenerator
 {
@@ -80,12 +81,12 @@ EOF
         [DllImport("lkh", EntryPoint = "SolveTSP")]
         private static extern int SolveTSP(string paramFileStr, string probFileStr, int[] indices, int length);
 
-        public void DBUGWriteToFilesWithName(string name)
+        public void WriteParamAndProbWithBaseName(string name)
         {
-            DBUGWriteToFiles(name, name);
+            WriteParamAndProb(name, name);
         }
 
-        public void DBUGWriteToFiles(string paramFileName = "z-param", string probFileName = "z-prob") {
+        void WriteParamAndProb(string paramFileName = "z-param", string probFileName = "z-prob") {
 
             if(!paramFileName.EndsWith(".par"))
                 paramFileName += ".par";
@@ -135,8 +136,32 @@ EOF
             return lkhOutReader.getIndices().ToArray();
         }
 
+        public ProcessSettings GetTSPCommand()
+        {
+            return new ProcessSettings
+            {
+                args = ".\\LKHBinary~\\lkh.exe " + ParFileName,
+                workingDirectory = Application.dataPath + "/LKHProbs~"
+            };
+        }
+
+        public bool OutputFileExists() { return System.IO.File.Exists(OutPath); }
+
+        public bool setIndicesFromOutputFile()
+        {
+            if (System.IO.File.Exists(OutPath))
+            {
+                indices = indicesFromOutputFile(OutPath);
+                Debug.Log("got indices from file^^^^");
+                return indices.Length == length;
+            }
+            return false;
+        }
+
+        /*
         public bool runSolver()
         {
+            throw new Exception("please don't use this");
             dbugParamProbFiles();
             if (DBUGOnlyWriteProbAndParam)
             {
@@ -152,12 +177,7 @@ EOF
                         OutputFolder,
                         true);
                 }
-                if (System.IO.File.Exists(OutPath))
-                {
-                    indices = indicesFromOutputFile(OutPath);
-                    Debug.Log("got indices from file^^^^");
-                    return indices.Length == length;
-                }
+                if (setIndicesFromOutputFile()) { return true; }
             }
 
             if (OnlyUseOutputFilesDontRunSolver)
@@ -184,6 +204,7 @@ EOF
             WriteIndicesToOutputFile();
             return result == 0;
         }
+        */
 
         private void dbugParamProbFiles() {
             Debug.Log(GetParamString);
@@ -211,7 +232,7 @@ EOF
                 eucPoints.Append(string.Format("{0} {1} {2}\n", ++tsp.length, (int)scaled.x, (int)scaled.y));
             }
             tsp.problemFileStr = string.Format(ProblemFormat, tsp.length, eucPoints.ToString());
-            tsp.DBUGWriteToFilesWithName(tsp.IndicesInOutFileBaseName);
+            tsp.WriteParamAndProbWithBaseName(tsp.IndicesInOutFileBaseName);
             return tsp;
         }
     }

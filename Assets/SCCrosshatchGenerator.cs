@@ -136,8 +136,9 @@ namespace SCGenerator
             MachineConfig machineConfig, 
             HatchConfig hatchConfig, 
             SCSvgFileData scSvgFileData,
-            Box2 svgViewBox
-            ) : base(machineConfig, svgViewBox) {
+            Box2 svgViewBox,
+            GeneratorConfig generatorConfig
+            ) : base(machineConfig, svgViewBox, generatorConfig) {
 
             //this.machineConfig = machineConfig;
             //viewBoxToPaperScale = svgViewBox.getFitScale(machineConfig.paper.size);
@@ -155,7 +156,7 @@ namespace SCGenerator
         //
         // Overrideable
         //
-        public override IEnumerable<PenDrawingPath> generate() //StripedPathSet spSet) // spSet now a mem var. TODO: allow TSP version to generate without one
+        public override IEnumerable<PenDrawingPath> generate() 
         {
 
             foreach (var stripedPath in spSet.iter())

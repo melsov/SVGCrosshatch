@@ -15,7 +15,8 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using SCPointGenerator;
 
-public class SVGCrosshatch : MonoBehaviour {
+public class SVGCrosshatch : MonoBehaviour
+{
 
     [SerializeField]
     string svgFile = @"star.svg";
@@ -38,8 +39,18 @@ public class SVGCrosshatch : MonoBehaviour {
     [SerializeField]
     SCPathDisplay pathDisplayPrefab;
 
-    BMapPainter painter;
     MachineConfig machineConfig;
+    [SerializeField]
+    GeneratorConfig _generatorConfig;
+
+    public GeneratorConfig generatorConfig {
+        get {
+            return _generatorConfig;
+        }
+    }
+
+    BMapPainter painter;
+
     GCodeWriter gCodeWriter;
 
     Color testColor = Color.cyan;
@@ -49,6 +60,7 @@ public class SVGCrosshatch : MonoBehaviour {
 
     [SerializeField]
     Text timeScaleCommentText;
+
 
     void updateTimeScaleComment()
     {
@@ -80,15 +92,58 @@ public class SVGCrosshatch : MonoBehaviour {
     [SerializeField]
     BitMapPointGenerator bitMapPointGenerator;
 
-    public BitMapPointGenerator GetBitMapPointGenerator() { return bitMapPointGenerator; }
+    public bool isInBitmapMode {
+        get {
+            return useBitMapPointGenerator;
+        }
+        set {
+            useBitMapPointGenerator = value;
+        }
+    }
 
-    SCBasePenPathGenerator generator;
+    public int MaxCities {
+        get {
+            return bitMapPointGenerator.tspProbMaxCities;
+        }
+        set {
+            bitMapPointGenerator.tspProbMaxCities = value;
+        }
+    }
 
+    public string inputFilePath {
+        get {
+            return useBitMapPointGenerator ? bitmapFullPath : svgFullPath;
+        }
+        set {
+            if (useBitMapPointGenerator)
+            {
+                bitmapFullPath = value;
+            } else
+            {
+                svgFullPath = value;
+            }
+        }
+    }
 
+    string bitmapFullPath {
+        get {
+            return bitMapPointGenerator.bmapName;
+        }
+        set {
+            if (FileUtil.isValidFileName(value))
+            {
+                var tryFile = FileUtil.AppendExtensionIfMissing(value, "png");
 
-    
+                string fPath;
+                if(FileUtil.validateSomewhere(tryFile, DataFolder + "bitmap/", out fPath))
+                {
+                    bitMapPointGenerator.bmapName = fPath;
+                }
+            }
+        }
+    }
 
-    public string svgFullPath {
+    string svgFullPath {
         get {
             if (!File.Exists(svgFile))
             {
@@ -97,20 +152,20 @@ public class SVGCrosshatch : MonoBehaviour {
             return svgFile;
         }
         set {
-            if (value != null && value.Length > 0 && FileUtil.isValidFileName(value)) {
-                print(value);
-                
+            if (FileUtil.isValidFileName(value))
+            {
                 string tryFileName = FileUtil.AppendSVGExtension(value);
 
                 string fPath;
-                if(FileUtil.validateSomewhere(tryFileName, DataFolder, out fPath )) {
-
+                if(FileUtil.validateSomewhere(tryFileName, DataFolder, out fPath ))
+                {
                     svgFile = fPath;
                 }
             } 
         }
     }
 
+    SCBasePenPathGenerator generator;
 
 
     public string svgFileNameNoExtension {
@@ -122,14 +177,6 @@ public class SVGCrosshatch : MonoBehaviour {
     void Start () {
         StartCoroutine(lateStart());
 	}
-
-
-    float testFMods(float minY, float interval) {
-        if (minY < 0f) {
-            return minY - (minY % interval);
-        }
-        return minY + (interval - (minY % interval));
-    }
 
     private IEnumerator lateStart() {
         yield return new WaitForSeconds(.2f);
@@ -155,7 +202,6 @@ public class SVGCrosshatch : MonoBehaviour {
 
     void Setup()
     {
-
         finished = false;
         canvasClone = Instantiate(canvas);
         mat.mainTexture = canvasClone;
@@ -165,7 +211,8 @@ public class SVGCrosshatch : MonoBehaviour {
         painter = new BMapPainter(canvasClone, machineConfig.paper);
     }
 
-    private void clear() {
+    private void clear()
+    {
         Destroy(canvasClone);
         if (gCodeWriter != null)
             gCodeWriter.Reset();
@@ -187,9 +234,7 @@ public class SVGCrosshatch : MonoBehaviour {
     {
         try
         {
-
             setupPainter();
-
 
             if (progressUpdates)
             {
@@ -202,16 +247,12 @@ public class SVGCrosshatch : MonoBehaviour {
         } 
         catch(Exception e)
         {
-            Debug.Log("exception in main: ");
-            Debug.Log(e.ToString());
-
+            Debug.Log("exception in main: " + e.ToString());
         }
     }
 
     void CreateGenerator()
     {
-        //SCBasePenPathGenerator generator;
-
         SVGViewBox viewBox = SCCSSParser.ParseViewBox(svgFullPath);
         CSSLookup lookup = SCCSSParser.Parse(svgFullPath);
 
@@ -231,7 +272,7 @@ public class SVGCrosshatch : MonoBehaviour {
         //
         if (generatorType == GeneratorType.Crosshatch)
         {
-            var crosshatchGenerator = new SCCrosshatchGenerator(machineConfig, new HatchConfig(), _svgFileData, viewBox);
+            var crosshatchGenerator = new SCCrosshatchGenerator(machineConfig, new HatchConfig(), _svgFileData, viewBox, _generatorConfig);
             crosshatchGenerator.UsePathSet(stripedPathSet);
             generator = crosshatchGenerator;
         }
@@ -240,16 +281,15 @@ public class SVGCrosshatch : MonoBehaviour {
             SCTSPCrosshatchGenerator tspGenerator;
             if (useBitMapPointGenerator)
             {
-                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, bitMapPointGenerator.imageBox);
+                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, bitMapPointGenerator.imageBox, _generatorConfig);
                 tspGenerator.SetTSPPointSets(bitMapPointGenerator.getPoints());
 
-                tspGenerator.BaseFileName = Path.GetFileNameWithoutExtension(bitMapPointGenerator._bmapName);
-                
+                tspGenerator.BaseFileName = Path.GetFileNameWithoutExtension(bitMapPointGenerator.bmapName);
             }
             else
             {
                 List<Vector2f> points;
-                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, viewBox);
+                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, viewBox, _generatorConfig);
                 points = stripedPathSet.AllPathsToPoints();
                 tspGenerator.AddPoints(points);
             }
@@ -315,7 +355,8 @@ public class SVGCrosshatch : MonoBehaviour {
         addPenSubscribers(pen);
 
         int count = 0;
-        foreach (PenDrawingPath penPath in generator.generate()) {
+        foreach (PenDrawingPath penPath in generator.generate())
+        {
             pen.makeMoves(penPath);
             if(showWithLineRenderers) { lineRenderPenPath(penPath); }
 

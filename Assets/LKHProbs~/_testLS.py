@@ -2,6 +2,8 @@ import glob
 import sys
 import subprocess
 import os
+import math
+import time
 
 # if(len(sys.argv) < 2):
 # 	print "tell me a name or pattern for files to delete please"
@@ -20,6 +22,15 @@ import os
 
 # for f in files:
 # 	print f
+
+
+sleep = 7
+if(len(sys.argv) > 1):
+	sleep = int(sys.argv[1])
+
+print "sleep time %s" % (sleep)
+
+time.sleep(sleep)
 
 print "DID LIST THE ABOVE FILES"
 

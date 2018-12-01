@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
+using SCUtil;
 
 namespace SCTest
 {
@@ -56,7 +58,10 @@ namespace SCTest
             //startcamera();
             //doCMD();
             //altCMD();
-            doCMDA();
+
+            //doCMDA();
+
+            poolProcesses();
         }
 
         static int caminterrupt;
@@ -66,6 +71,31 @@ namespace SCTest
             string strCmdText;
             strCmdText = "/C dir"; // copy /b Image1.jpg + Archive.rar Image2.jpg";
             System.Diagnostics.Process.Start("CMD.exe", strCmdText);
+        }
+
+
+        static void poolProcesses()
+        {
+            int[] waits = new int[] { 3, 9, 2, 1, 12, 14, 3, 5 };
+
+            string shellArgs = "python _testLS.py ";
+            System.Diagnostics.Process[] processes = new System.Diagnostics.Process[waits.Length];
+
+            string workingDir = Application.dataPath + "/LKHProbs~";
+            CMDProcessPool pool = new CMDProcessPool(3);
+
+            print("add jobs");
+            for(int i = 0; i < waits.Length; ++i)
+            {
+                string arg = shellArgs + waits[i];
+                pool.Add(new ProcessSettings { workingDirectory = workingDir, args = arg });
+            }
+
+            print("will run");
+
+            pool.run();
+
+            print("done with pool");
         }
 
         static void doCMDA()

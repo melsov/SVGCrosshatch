@@ -23,7 +23,7 @@ namespace Assets.BMapToPoints
         {
             //var _crosshatch = FindObjectOfType<SVGCrosshatch>();
             var bmapToPoint = new BitMapPointGenerator(); // _crosshatch.GetBitMapPointGenerator();
-            bmapToPoint._bmapName = bmapPath;
+            bmapToPoint.bmapName = bmapPath;
 
             var points = bmapToPoint.getPoints();
             for(int i = 0; i < points.Count; ++i)
@@ -31,7 +31,7 @@ namespace Assets.BMapToPoints
                 string name = bmapToPoint.GetBaseName() + i;
                 var tspProb = TSPLibProblem.FromPoints(points[i].GetEnumerator(), name );
                 //string name = Path.GetFileNameWithoutExtension(bmapToPoint._bmapName);
-                tspProb.DBUGWriteToFilesWithName(name);
+                tspProb.WriteParamAndProbWithBaseName(name);
 
             }
 

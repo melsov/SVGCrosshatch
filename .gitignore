@@ -28,6 +28,11 @@
 
 *.meta
 
+#ignore tsp files
+*.tsp
+*.par
+*.out.txt
+
 #even if in sub-directories
 !*/
 
@@ -45,4 +50,7 @@
 #Library/
 #Library/*
 #ProjectSettings/
+Standard*Assets/
+Sample*Scenes/
+_MSGameScratchPad/
 .vs/

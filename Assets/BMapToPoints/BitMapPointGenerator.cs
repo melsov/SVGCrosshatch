@@ -28,18 +28,26 @@ namespace SCPointGenerator
                 return _texture;
             }
         }
+
         [SerializeField]
-        public string _bmapName = "bitmap/bomb.png";
+        string _bmapName = "bitmap/bomb.png";
+
         [SerializeField, Header("If splitting point sets. Max cities per point set")]
-        int tspProbMaxCities = 100;
+        public int tspProbMaxCities = 100;
 
         [SerializeField]
         bool splitPointSets;
 
         public string bmapName {
             get {
-                Debug.Log("ext: " + Path.GetExtension(_bmapName));
                 return FileUtil.FormatApplicationDataPathIfNE(_bmapName, Path.GetExtension(_bmapName));
+            }
+            set {
+                if(!String.IsNullOrEmpty(_bmapName) && !_bmapName.Equals(value))
+                {
+                    _texture = null;
+                    _bmapName = value;
+                }
             }
         }
 
