@@ -31,7 +31,7 @@ namespace SCGenerator
             }
         }
 
-        [Header("Drill bit diameter or for a pen: line width at max 'penetration'")]
+        [Header("Drill bit diameter or for a pen: line width at max depth")]
         public double toolDiameterMM = 2f;
 
         [Header("Home offset")]
@@ -131,6 +131,8 @@ M2
         public bool isAtTravelHeight(Vector3d v) {
             return MathUtil.EpsilonEqual(v.z, travelHeightMM, locationEqualityEpsilonMM);
         }
+
+
 
         public bool isAtMaxPenetrationDepth(Vector3d v) {
             return MathUtil.EpsilonEqual(v.z, maxPenetrationDepthMM, locationEqualityEpsilonMM);

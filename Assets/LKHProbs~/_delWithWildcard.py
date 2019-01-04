@@ -4,50 +4,50 @@ import subprocess
 import os
 
 if(len(sys.argv) < 2):
-	print "tell me a name or pattern for files to delete please"
+	print "please provide a pattern or file name."
+	print "files are found using 'glob.glob( <pattern> )' which accepts wildcards."
+	print "'*' matches any set of characters (including none). example pattern: SomeFileName*"
+	print "example usage: "
+	print ""
+	print "python %s SomeFileName*" % (sys.argv[0])
+	print ""
 	exit(0)
 
 
 prefix = sys.argv[1]
 
 
-files = glob.glob(".\\%s" %(prefix));
+files = glob.glob(".\\%s" % (prefix));
 
 if len(files) == 0:
-	print "no files matched %s" %(prefix)
+	print "no files matched %s" % (prefix)
 	print "try *, wildcards etc?"
 	exit(0)
 
 for f in files:
 	print f
 
-print "WILL DELETE THE ABOVE FILES"
+print "WILL DELETE THE ABOVE %d FILES" % (len(files))
 
 response = raw_input("Y if you're sure you want to do this ('capital Y')")
 
 if response != "Y":
-	print "goodbye"
+	print "nothing deleted. bye."
 	exit(0)
 
 
 
 for f in files:
-	print f
 	command = 'del'
-	output = ""
+
 	try:
-		full_command = "%s %s" %(command, f)
+		full_command = "%s %s" % (command, f)
 		print full_command
 		os.system(full_command)
-		# output = subprocess.check_output([command, f])
+
 	except:
-		print "exception for %s: %s" %(f, output)
-		# try:
-		# 	command = '.\\lkh.exe'
-		# 	output = subprocess.check_output([command, f])
-		# except:
-		# 	print "no command worked. this script needs to know where the lkh executable is. (edit it or move the executable?) \\n also uses windows style slashes at the moment."
-		# 	exit(1)
-	print output
+		print "exception for %s" % (f)
+
+
 exit(0)
 

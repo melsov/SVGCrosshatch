@@ -136,6 +136,15 @@ EOF
             return lkhOutReader.getIndices().ToArray();
         }
 
+        public static ProcessSettings GetDeleteAllCommand(string _baseNameWithWildCard)
+        {
+            return new ProcessSettings
+            {
+                args = "python _DANGER_NO_CONFIRM_delWithWildcard.py " + _baseNameWithWildCard,
+                workingDirectory = Application.dataPath + "/LKHProbs~"
+            };
+        }
+
         public ProcessSettings GetTSPCommand()
         {
             return new ProcessSettings
@@ -144,6 +153,8 @@ EOF
                 workingDirectory = Application.dataPath + "/LKHProbs~"
             };
         }
+
+
 
         public bool OutputFileExists() { return System.IO.File.Exists(OutPath); }
 
@@ -224,7 +235,6 @@ EOF
             TSPLibProblem tsp = new TSPLibProblem(IndicesInOutFileName);
             tsp.multiplier = multiplier;
 
-            Debug.Log("will write to: " + IndicesInOutFileName);
             StringBuilder eucPoints = new StringBuilder(); 
             while(points.MoveNext())
             {

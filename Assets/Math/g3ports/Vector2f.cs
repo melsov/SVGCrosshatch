@@ -318,6 +318,16 @@ namespace g3
             }
         }
 
+        internal Vector3 ToVector3(float z)
+        {
+            return new Vector3(x, y, z);
+        }
+
+        internal Vector2 ToVector2()
+        {
+            return new Vector2(x, y);
+        }
+
 
 
 #if G3_USING_UNITY

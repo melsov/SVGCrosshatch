@@ -11,6 +11,7 @@ using VctorExtensions;
 using System.Collections;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using SCUtil;
 
 namespace SCGenerator
 {
@@ -88,12 +89,22 @@ namespace SCGenerator
 
         public void Add(PenMove p) { moves.Add(p); }
 
-        public void addTravelMode(Vector2f to) {
+        public void addTravelMove(Vector2f to) {
             Add(new PenMove() { destination = to, up = true });
+        }
+
+        public void addTravelMove(Vector2f to, Color c)
+        {
+            Add(new PenMove() { destination = to, up = true, color = c });
         }
 
         public void addDrawMove(Vector2f to) {
             Add(new PenMove() { destination = to, up = false });
+        }
+
+        public void addDrawMove(Vector2f to, Color c)
+        {
+            Add(new PenMove() { destination = to, up = false, color = c });
         }
 
         public void addDownUpDrawMove(Vector2f start, Vector2f end, Color c) {
@@ -107,6 +118,36 @@ namespace SCGenerator
             }
         }
         
+        public Mesh ToMesh(float lineWidth, bool showTravelMoves = false)
+        {
+
+            MeshUtil.MeshData mdata = new MeshUtil.MeshData();
+
+            int triOffset = 0;
+            Color c;
+            for(int i=1; i < moves.Count; ++i)
+            {
+                if (!showTravelMoves && moves[i].up) continue;
+
+                var prev = moves[i - 1];
+                var next = moves[i];
+
+                MeshUtil.Line(
+                    ref mdata,
+                    prev,
+                    next,
+                    ref triOffset,
+                    col: next.color != null ? next.color.color : (next.up ? Color.red : Color.blue),
+                    zOffset: next.up ? -2f : 0f,
+                    width: lineWidth);//  Mathf.Clamp(.15f, .9f, (prev.destination - next.destination).Length * .1f));
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = mdata.verts.ToArray();
+            mesh.triangles = mdata.tris.ToArray();
+            mesh.colors = mdata.cols.ToArray();
+            return mesh;
+        }
 
     }
 

@@ -61,6 +61,10 @@ public class SVGCrosshatch : MonoBehaviour
     [SerializeField]
     Text timeScaleCommentText;
 
+    [SerializeField]
+    MeshRenderer pixelTreeDebugDisplay;
+
+
 
     void updateTimeScaleComment()
     {
@@ -81,7 +85,7 @@ public class SVGCrosshatch : MonoBehaviour
 
     enum GeneratorType
     {
-        Crosshatch, TSPCrosshatch
+        Crosshatch, TSPCrosshatch, Triangles
     }
     [SerializeField]
     GeneratorType generatorType;
@@ -187,6 +191,9 @@ public class SVGCrosshatch : MonoBehaviour
         get { return FileUtil.OutGCodeFileOnDesktopWithFileName(svgFileNameNoExtension); }
     }
 
+    [SerializeField]
+    bool ShouldMeshPixelTree;
+
     public bool save() {
         if(!finished) {
             Debug.Log("not finished");
@@ -276,12 +283,27 @@ public class SVGCrosshatch : MonoBehaviour
             crosshatchGenerator.UsePathSet(stripedPathSet);
             generator = crosshatchGenerator;
         }
+        else if(generatorType == GeneratorType.Triangles)
+        {
+
+            var pixelTree = bitMapPointGenerator.getPixelTriTree();
+            //if (ShouldMeshPixelTree)
+            //    pixelTreeDebugDisplay.GetComponent<MeshFilter>().mesh = pixelTree.getMesh();
+
+            var pointSetGenerator = new SCTriangleCrosshatchGenerator(
+                machineConfig,
+                _generatorConfig,
+                pixelTree,
+                bitMapPointGenerator);
+
+            generator = pointSetGenerator;
+        }
         else
         {
             SCTSPCrosshatchGenerator tspGenerator;
             if (useBitMapPointGenerator)
             {
-                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, bitMapPointGenerator.imageBox, _generatorConfig);
+                tspGenerator = new SCTSPCrosshatchGenerator(machineConfig, bitMapPointGenerator.inputImageBox, _generatorConfig);
                 tspGenerator.SetTSPPointSets(bitMapPointGenerator.getPoints());
 
                 tspGenerator.BaseFileName = Path.GetFileNameWithoutExtension(bitMapPointGenerator.bmapName);
@@ -301,11 +323,10 @@ public class SVGCrosshatch : MonoBehaviour
 
     void setupPainter()
     {
-        painter.lineWidth = 5f;
+        painter.SetLineWidthWithPenDiamMM((float)machineConfig.toolDiameterMM);
         painter.color = new Color(0f, 1f, .9f);
         painter.DrawBox(machineConfig.paper);
         painter.DrawBox(machineConfig.paper.expandUniform(-3f));
-        painter.lineWidth = 2f;
         painter.color = Color.black;
         painter.flipY = !yAxisInverted;
         painter.applyTexture();
@@ -313,8 +334,10 @@ public class SVGCrosshatch : MonoBehaviour
 
  
 
-    void addPenSubscribers(SCPen pen) {
-        if (dbugSettings.paintFromPenMoves) {
+    void addPenSubscribers(SCPen pen)
+    {
+        if (dbugSettings.paintFromPenMoves)
+        {
             pen.subscribe((PenUpdate pu) =>
             {
                 painter.DrawPenUpdate(pu);
@@ -326,16 +349,19 @@ public class SVGCrosshatch : MonoBehaviour
         });
     }
 
-    void paintFromGCode() {
+    void paintFromGCode()
+    {
         if (!dbugSettings.paintFromGCode) { return; }
         if(dbugSettings.paintFromGCode && dbugSettings.paintFromPenMoves) {
-            Debug.Log("Warning: drawing crosshatches twice ");
+            Debug.LogWarning("Paint from GCode and Pen Moves both enabled. drawing crosshatches twice. ");
         }
         GCodeCursor gCodeCursor = new GCodeCursor();
         gCodeCursor.subscribe((CursorUpdate cu) =>
         {
             painter.DrawCursorUpdate(cu);
         });
+
+        //TODO: paint from gcode should only draw travel moves when asked to do so
 
         foreach(string line in gCodeWriter.getLines()) {
             gCodeCursor.moveTo(line);
@@ -349,6 +375,16 @@ public class SVGCrosshatch : MonoBehaviour
         finished = true;
     }
 
+    void DebugPenPathToLineMesh(PenDrawingPath penPath)
+    {
+        GameObject go = new GameObject("penPathMeshDisplay" + UnityEngine.Random.Range(0f, 999999999f));
+        go.transform.position = pixelTreeDebugDisplay.transform.position + Vector3.back * 5f;
+        MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+        MeshFilter filter = go.AddComponent<MeshFilter>();
+        meshRenderer.material = pixelTreeDebugDisplay.GetComponent<MeshRenderer>().sharedMaterial; // use pixel tree mesh material
+        go.GetComponent<MeshFilter>().mesh = penPath.ToMesh((float)machineConfig.toolDiameterMM, dbugSettings.drawTravelMoves);
+    }
+
     IEnumerator getProgressiveCrosshatches(SCBasePenPathGenerator generator)
     {
         SCPen pen = FindObjectOfType<SCPen>();
@@ -357,6 +393,8 @@ public class SVGCrosshatch : MonoBehaviour
         int count = 0;
         foreach (PenDrawingPath penPath in generator.generate())
         {
+            DebugPenPathToLineMesh(penPath);
+
             pen.makeMoves(penPath);
             if(showWithLineRenderers) { lineRenderPenPath(penPath); }
 

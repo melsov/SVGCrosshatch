@@ -25,7 +25,10 @@ namespace VctorExtensions
 
         public static Vector2 max(this Vector2 v, Vector2 other) { return new Vector2(Mathf.Max(v.x, other.x), Mathf.Max(v.y, other.y)); }
 
-        public static Vector2 perp(this Vector2 v, bool turnRight = false) { return turnRight ?  new Vector2(v.y, -v.x) : new Vector2(-v.y, v.x); }
+        public static Vector2 perp(this Vector2 v)
+        {
+            return Vector3.Cross(v.toVector3(0f), Vector3.forward).toVector2f();
+        }
 
         //Vec3 extensions
         public static Vector2 xy(this Vector3 v) { return new Vector2(v.x, v.y); }

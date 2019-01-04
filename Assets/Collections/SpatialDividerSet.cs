@@ -7,15 +7,7 @@ using UnityEngine;
 
 namespace SCCollection
 {
-    public abstract class Cubbie
-    {
-        public Vector2i pos;
-    }
 
-    public class SpatialDividerSet 
-    {
-
-    }
 
     public class IsoTrianglei
     {
@@ -28,7 +20,8 @@ namespace SCCollection
         List<Vector2f> data = new List<Vector2f>();
 
         float up { get { return inverted ? -1f : 1f; } }
-        
+
+        #region point-access
         Vector2f lowerLeftCorner {
             get {
                 return new Vector2f(_base.x - dims.x / 2, _base.y - dims.y * (inverted ? 1f : 0f));
@@ -65,24 +58,42 @@ namespace SCCollection
             }
         }
 
+        #endregion
+
+        public List<Vector2f> Border(bool closed = false)
+        {
+            if (closed)
+            {
+                return new List<Vector2f>() { baseLeft, baseRight, apex, baseLeft };
+            }
+            else
+            {
+                return new List<Vector2f>() { baseLeft, baseRight, apex, };
+            }
+        }
+
+
+        #region queries
+
         public bool Contains(Vector2f v)
         {
 
-            if(v.EitherComponentLessThan(lowerLeftCorner))
+            if (v.EitherComponentLessThan(lowerLeftCorner))
             {
                 return false;
             }
-            if(v.EitherComponentGreaterThan(upperRightCorner))
+            if (v.EitherComponentGreaterThan(upperRightCorner))
             {
                 return false;
             }
 
 
             Vector2f dif;
-            if(v.x > _base.x)
+            if (v.x > _base.x)
             {
                 dif = v - baseRight;
-            } else
+            }
+            else
             {
                 dif = v - baseLeft;
             }
@@ -99,7 +110,6 @@ namespace SCCollection
                 baseLeft,
                 baseRight,
                 apex,
-
             };
         }
 
@@ -117,6 +127,8 @@ namespace SCCollection
                 return data[i];
             }
         }
+
+        #endregion
 
         public void Divide()
         {
@@ -140,10 +152,10 @@ namespace SCCollection
             children.Add(lr);
 
             int DBUGLost = 0;
-            foreach(var v in data)
+            foreach (var v in data)
             {
                 bool lostOne = true;
-                foreach(var c in children)
+                foreach (var c in children)
                 {
                     if (c.Contains(v))
                     {
@@ -152,7 +164,7 @@ namespace SCCollection
                         break;
                     }
                 }
-                if(lostOne)
+                if (lostOne)
                 {
                     DBUGLost++;
                     //Gizmos.color = Color.magenta;
@@ -160,7 +172,7 @@ namespace SCCollection
                 }
             }
 
-            if(DBUGLost > 0)
+            if (DBUGLost > 0)
                 Debug.LogWarning("lost data: " + DBUGLost);
 
             data.Clear();
@@ -170,7 +182,7 @@ namespace SCCollection
         {
             Stack<IsoTrianglei> s = new Stack<IsoTrianglei>();
             s.Push(this);
-            while(s.Count > 0)
+            while (s.Count > 0)
             {
                 var tri = s.Pop();
                 if (!tri.isNode())
@@ -197,7 +209,32 @@ namespace SCCollection
 
         public IEnumerable<Vector2f> GetData()
         {
-            foreach(var v in data) { yield return v; }
+            foreach (var v in data) { yield return v; }
+        }
+
+
+        internal List<List<Vector2f>> GetAllTriBorders(bool closeBorder = false)
+        {
+            List<List<Vector2f>> result = new List<List<Vector2f>>();
+            Stack<IsoTrianglei> s = new Stack<IsoTrianglei>();
+            s.Push(this);
+            while (s.Count > 0)
+            {
+                var tri = s.Pop();
+                if (tri.isNode())
+                {
+                    foreach (var c in tri.children)
+                    {
+                        s.Push(c);
+                    }
+                }
+                else
+                {
+                    result.Add(tri.Border(closeBorder));
+                }
+            }
+
+            return result;
         }
 
         public List<List<Vector2f>> GetAll()
@@ -240,7 +277,7 @@ namespace SCCollection
                         s.Push(c);
                     }
                 }
-               
+
             }
 
             return result;
@@ -284,7 +321,7 @@ namespace SCCollection
                             return c.Add(v);
                         }
                     }
-                } 
+                }
                 else
                 {
                     data.Add(v);
@@ -295,7 +332,13 @@ namespace SCCollection
             return null;
         }
 
-        
+        public Mesh ToMesh()
+        {
+            Mesh mesh = new Mesh();
+
+            return mesh;
+        }
+
     }
 
     public class SierpinskiVectorTree
@@ -342,6 +385,11 @@ namespace SCCollection
                     l.Divide();
                 }
             }
+        }
+
+        public List<List<Vector2f>> GetAllTriBorders(bool closeBorder = false)
+        {
+            return root.GetAllTriBorders(closeBorder);
         }
 
         public List<List<Vector2f>> GetAll()

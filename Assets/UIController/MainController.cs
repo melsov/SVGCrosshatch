@@ -33,17 +33,22 @@ namespace UIController
 
         private void setup()
         {
-            setInputFileField();
             setupCrosshatchConfig();
+            setInputFileField();
         }
 
         void setupCrosshatchConfig()
         {
-            bitMapModeToggle.onValueChanged.AddListener(delegate {
-                OnBitMapModeToggled(bitMapModeToggle.isOn);
-            });
+            bitMapModeToggle.onValueChanged.AddListener(
+                delegate 
+                {
+                    svgCrosshatch.isInBitmapMode = bitMapModeToggle.isOn;
+                    setInputFileField();
+                });
+
             bitMapModeToggle.isOn = svgCrosshatch.isInBitmapMode;
             maxCitiesField.text = "" + svgCrosshatch.MaxCities;
+
             maxCitiesField.onEndEdit.AddListener(delegate
             {
                 OnEditMaxCitiesField(maxCitiesField);
@@ -84,10 +89,6 @@ namespace UIController
             setInputFileField();
         }
 
-        public void OnBitMapModeToggled(bool useBitmapMode)
-        {
-            print(useBitmapMode);
-        }
 
 
         public void save() {

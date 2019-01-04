@@ -15,7 +15,7 @@ namespace SCDisplay
 
     public class GCodeCursor
     {
-        VelocityV3f vv;
+        VelocityV3f cursor;
 
         List<Action<CursorUpdate>> subscribers = new List<Action<CursorUpdate>>();
 
@@ -23,13 +23,20 @@ namespace SCDisplay
 
         public void moveTo(string gcodeLine) {
 
-            VelocityV3f next = vv;
+            VelocityV3f next = cursor;
             foreach(GMoveComponent gmove in GCodeToVec3.FromLine(gcodeLine)) {
                 next.apply(gmove);
             }
-            if (!next.validPosition) { return; }
-            foreach(var sub in subscribers) { sub(new CursorUpdate() { from = vv, to = next }); }
-            vv = next;
+
+            if (!next.validPosition) {
+                Debug.LogWarning("Invalid gcode line: " + gcodeLine);
+                return;
+            }
+
+            var update = new CursorUpdate { from = cursor, to = next };
+            foreach (var sub in subscribers) { sub(update); }
+
+            cursor = next;
         }
         
     }

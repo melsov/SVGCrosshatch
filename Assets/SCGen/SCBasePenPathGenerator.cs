@@ -7,7 +7,7 @@ namespace SCGenerator
 
     public abstract class SCBasePenPathGenerator
     {
-        protected float viewBoxToPaperScale = 1f;
+        protected float viewBoxToPaperScale;
         protected GeneratorConfig generatorConfig;
         protected MachineConfig machineConfig;
 

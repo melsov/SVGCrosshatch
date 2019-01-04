@@ -16,7 +16,7 @@ namespace SCDisplay
     {
         SCBitmap map;
         Box2 viewBox;
-        float scaleToMap;
+        public float BitMapToPaperScale { get; private set; }
         public bool flipX = true;
         public bool flipY = false;
         DbugSettings dbugSettings;
@@ -40,9 +40,14 @@ namespace SCDisplay
         {
             map = new SCBitmap(tex);
             this.viewBox = viewBox;
-            scaleToMap = viewBox.getFitScale(map.size);
+            BitMapToPaperScale = viewBox.getFitScale(map.size);
             dbugSettings = UnityEngine.Object.FindObjectOfType<DbugSettings>();
             machineConfig = UnityEngine.Object.FindObjectOfType<MachineConfig>();
+        }
+
+        public void SetLineWidthWithPenDiamMM(float diamMM)
+        {
+            lineWidth = diamMM * BitMapToPaperScale;
         }
 
         public void DrawBox(Box2 box) {
@@ -52,16 +57,22 @@ namespace SCDisplay
         }
 
         public void DrawLine(Vector2 from, Vector2 to) {
-            map.DrawLine(flip(from * scaleToMap), flip(to * scaleToMap), dbugSettings.pathDirIndicators);
+            map.DrawLine(flip(from * BitMapToPaperScale), flip(to * BitMapToPaperScale), dbugSettings.pathDirIndicators);
         }
 
         public void DrawCursorUpdate(CursorUpdate cu) {
+            //DEBUG
+            if(cu.to.z > 0f)
+            {
+                Debug.Log("z height of to: " + cu.to.z);
+            }
             if (machineConfig.isAtTravelHeight(cu.to)) {
-                if (dbugSettings.drawTravelMoves) {
+                if (dbugSettings.drawTravelMoves)
+                {
                     DrawTravelMove(cu.from.xy, cu.to.xy);
-                    return;
                 }
-            } else {
+            } else
+            {
                 DrawLine(cu.from.xy, cu.to.xy);
             }
         }
@@ -73,7 +84,8 @@ namespace SCDisplay
             PenMove next;
             for(int i = 1; i < moves.Count; ++i) {
                 next = moves[i];
-                DrawLine(last.destination, next.destination);
+                if (!next.up || dbugSettings.drawTravelMoves)
+                    DrawLine(last.destination, next.destination);
                 last = next;
             }
         }
@@ -85,7 +97,7 @@ namespace SCDisplay
 
         private void DrawTravelMove(Vector2f from, Vector2f to) {
             lineWidth = .9f;
-            color = new Color(.6f, .1f, .1f);
+            color = new Color(1f, .1f, .1f);
             DrawLine(from, to);
             color = Color.black;
             lineWidth = 2f;
@@ -136,37 +148,57 @@ public class SCBitmap
         size = new Vector2(tex.width, tex.height);
     }
 
-    public void DrawLine(Vector2 from, Vector2 to, bool shouldUseDirIndicator = false) {
-        Vector2 dir = to - from;
-        float mag = dir.magnitude;
-        if(mag < Mathf.Epsilon) { return; }
-        dir /= mag;
-        //LineOne(from, dir, mag);
+    public void DrawLine(Vector2 from, Vector2 to, bool shouldUseDirIndicator = false)
+    {
         LineBox(from, to, lineWidth, shouldUseDirIndicator);
     }
 
-    private void LineBox(Vector2 from, Vector2 to, float width = 2f, bool shoudlUseDirIndicator = false) {
+    private void LineBox(Vector2 from, Vector2 to, float width = 2f, bool shoudlUseDirIndicator = false)
+    {
         Vector2 dir = to - from;
         float mag = dir.magnitude;
         if(mag < Mathf.Epsilon) { return; }
         dir /= mag;
-        Vector2 perp = dir.perp();
-        Vector2i start = from + perp * (width / 2f);
 
-        float ang = Mathf.Atan2(dir.y, dir.x);
-        Matrix2f mat = new Matrix2f(ang);
-        AxisAlignedBox2i aaBox = new AxisAlignedBox2i(0, -Mathf.RoundToInt(width / 2f), Mathf.RoundToInt(mag), Mathf.RoundToInt(width / 2));
-        foreach(var vi in aaBox.IndicesInclusive()) {
-            SetPixel(start + mat * vi);
-        }
-        //TODO: optimize this 
-        if (shoudlUseDirIndicator) {
-            Vector2 arrow = to;
-            foreach(int i in Enumerable.Range(0, 16)) {
-                SetPixel(arrow, Color.red);
-                arrow -= dir;
+        Vector2 perp = dir.perp();
+        Vector2 start = from - perp * (width / 2f);
+
+        float incr = .7071f; // 1 / root2
+
+        Vector2 cursor = Vector2.zero;
+
+        while (cursor.x < mag)
+        {
+            cursor.y = 0f;
+            while (cursor.y < width)
+            {
+                SetPixel(start + perp * cursor.y + dir * cursor.x);
+                cursor.y += incr;
             }
+
+            cursor.x += incr;
         }
+
+
+        //Vector2i starti = from - perp * (width / 2f);
+
+        //float ang = Mathf.Atan2(dir.y, dir.x);
+        //Matrix2f mat = new Matrix2f(ang);
+        //AxisAlignedBox2i aaBox = new AxisAlignedBox2i(0, -Mathf.RoundToInt(width / 2f), Mathf.RoundToInt(mag), Mathf.RoundToInt(width / 2));
+        //foreach (var vi in aaBox.IndicesInclusive())
+        //{
+        //    SetPixel(starti + mat * vi);
+        //}
+        ////TODO: optimize this 
+        //if (shoudlUseDirIndicator)
+        //{
+        //    Vector2 arrow = to;
+        //    foreach (int i in Enumerable.Range(0, 16))
+        //    {
+        //        SetPixel(arrow, Color.red);
+        //        arrow -= dir;
+        //    }
+        //}
     }
 
 
